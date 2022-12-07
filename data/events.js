@@ -1,4 +1,5 @@
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
+const users = require('./users');
 const mongoCollections = require('../config/mongoCollections');
 const user_collection = mongoCollections.user_collection;
 const event_collection = mongoCollections.event_collection;
@@ -11,12 +12,10 @@ const createEvent = async (
 	postedBy,
 	tags,
 	description,
-	capacity,
-	college
+	capacity
 ) => {
 	//
 	const event_collection_c = await event_collection();
-	const user_collection_c = await user_collection();
 
 	helpers.errorIfNotProperString(eventName, 'eventName');
 	helpers.errorIfNotProperString(location, 'location');
@@ -29,13 +28,15 @@ const createEvent = async (
 	//check if user exists
 	helpers.errorIfNotProperUserName(postedBy, 'postedBy');
 	postedBy = postedBy.trim();
-	let user = await user_collection_c.findOne({ userName: postedBy });
+	let user = await users.getUserData(postedBy);
 	if (!user) throw `No user present with userName: ${postedBy}`;
 
 	helpers.errorIfNotProperString(tags, 'Tags');
 	tags = tags.split(',');
 	helpers.errorIfNotProperString(description, 'description');
-	helpers.errorIfNotProperString(college, 'college');
+
+	//	helpers.errorIfNotProperString(college, 'college');
+	college = user.college;
 
 	helpers.errorIfStringIsNotNumber(capacity);
 	capacity = parseFloat(capacity);
@@ -49,14 +50,14 @@ const createEvent = async (
 		location: location,
 		startTime: startTime,
 		endTime: endTime,
-		favoriteEvents: [],
-		eventsRegistered: [],
 		postedBy: postedBy,
 		tags: tags,
 		description: description,
 		capacity: capacity,
 		numUserRegistered: 0,
 		usersRegistered: [],
+		numFavorite: 0,
+		favoriteUsers: [],
 		images: [],
 		college: college,
 		comments: [],
@@ -70,3 +71,5 @@ const createEvent = async (
 		return { eventInserted: true };
 	}
 };
+
+module.exports = { createEvent };

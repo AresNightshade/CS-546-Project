@@ -3,7 +3,7 @@ const user_collection = mongoCollections.user_collection;
 const event_collection = mongoCollections.event_collection;
 const { ObjectId } = require('mongodb');
 
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const eventData = require('./events');
 
 const createComment = async (eventID, userID, comment) => {

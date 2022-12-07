@@ -1,5 +1,5 @@
 const mongoCollections = require('../config/mongoCollections');
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const user_collection = mongoCollections.user_collection;
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
