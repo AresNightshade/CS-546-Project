@@ -26,7 +26,7 @@ router
 			let result = await usersData.checkUser(userName, password);
 
 			if (result.authenticatedUser) {
-				req.session.user = userName;
+				req.session.user = result.user.userName;
 				return res.redirect('/');
 			} else {
 				res.status(500).render('userLogin', {
@@ -49,9 +49,8 @@ router
 	.get(async (req, res) => {
 		//code here for GET
 		if (req.session.user) {
-			return res.redirect('/user/login');
+			return res.redirect('/');
 		} else {
-			let collegeList_2 = collegeList;
 			res.render('userRegister', {
 				title: 'Register',
 				collegeList: collegeList,

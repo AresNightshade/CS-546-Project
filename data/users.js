@@ -65,7 +65,7 @@ const checkUser = async (username, password) => {
 	if (!user) throw `Either the username or password is invalid`;
 
 	if (await bcrypt.compare(password, user.password)) {
-		return { authenticatedUser: true };
+		return { authenticatedUser: true, user: user };
 	} else {
 		throw `Either the username or password is invalid`;
 	}
