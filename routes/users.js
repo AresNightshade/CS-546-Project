@@ -4,6 +4,7 @@ const router = express.Router();
 const helpers = require('../helpers');
 const data = require('../data');
 const usersData = data.users;
+const collegeList = data.college_list;
 
 router
 	.route('/login')
@@ -48,24 +49,40 @@ router
 	.get(async (req, res) => {
 		//code here for GET
 		if (req.session.user) {
-			return res.redirect('/');
+			return res.redirect('/user/login');
 		} else {
-			res.render('userRegister', { title: 'Register' });
+			let collegeList_2 = collegeList;
+			res.render('userRegister', {
+				title: 'Register',
+				collegeList: collegeList,
+			});
 		}
 	})
 	.post(async (req, res) => {
 		//code here for POST
 		let userName = req.body.usernameInput;
 		let password = req.body.passwordInput;
+
+		let firstName = req.body.firstNameInput;
+		let lastName = req.body.lastNameInput;
+		let college = req.body.collegeNameInput;
+
 		try {
 			helpers.errorIfNotProperUserName(userName, 'usernames');
 			helpers.errorIfNotProperPassword(password, 'password');
-			let result = await usersData.createUser(userName, password);
+			let result = await usersData.createUser(
+				userName,
+				password,
+				firstName,
+				lastName,
+				college
+			);
 			if (result.userInserted) {
-				return res.redirect('/');
+				return res.redirect('/user/login');
 			} else {
 				res.status(500).render('userRegister', {
 					title: 'Register',
+					collegeList: collegeList,
 					error: true,
 					error_message: `Internal Server Error`,
 				});
@@ -73,6 +90,7 @@ router
 		} catch (e) {
 			res.status(400).render('userRegister', {
 				title: 'Register',
+				collegeList: collegeList,
 				error: true,
 				error_message: e,
 			});

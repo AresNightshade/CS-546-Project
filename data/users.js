@@ -7,6 +7,8 @@ const saltRounds = 12;
 const createUser = async (username, password, firstName, lastName, college) => {
 	helpers.errorIfNotProperUserName(username, 'usernames');
 	helpers.errorIfNotProperPassword(password, 'password');
+	helpers.errorIfNotProperName(firstName, 'firstName');
+	helpers.errorIfNotProperName(lastName, 'lastName');
 
 	username.trim();
 	password.trim();

@@ -226,6 +226,26 @@ function errorIfNotProperDateTime(val, variableName) {
 
 	if (temp < currentDateTimeString) throw `Not Proper DateTime`;
 }
+
+function errorIfNotProperName(val, variableName) {
+	//
+	errorIfNotProperString(val, variableName);
+	val = val.trim();
+
+	for (let x of val) {
+		let i = x.charCodeAt(0);
+		if (
+			!(
+				(i >= 65 && i <= 90) || //Upper Case
+				(i >= 97 && i <= 122) || //Lower Case
+				i == 32 || //Space
+				false
+			)
+		) {
+			throw `${variableName || 'Input String'} is not Proper Name`;
+		}
+	}
+}
 module.exports = {
 	errorIfNotProperString,
 	errorIfNotProperPassword,
@@ -236,4 +256,5 @@ module.exports = {
 	errorIfStringIsNotNumber,
 	errorIfNotProperID,
 	errorIfNotProperDateTime,
+	errorIfNotProperName,
 };

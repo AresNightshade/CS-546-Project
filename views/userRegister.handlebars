@@ -23,7 +23,25 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <input type="text" name="usernameInput" id="usernameInput">
                 <label for="passwordInput">Password:</label>
                 <input type="password" name="passwordInput" id="passwordInput">
+
+                <label for="firstNameInput">First Name:</label>
+                <input type="Text" name="firstNameInput" id="firstNameInput">
+
+                <label for="lastNameInput">Last Name:</label>
+                <input type="Text" name="lastNameInput" id="lastNameInput">
+
+                <label for="College">Choose Your College:</label>
+
+                <select name="collegeNameInput" id="collegeNameInput">
+                <option value="">--Please choose your College--</option>
+                {{#each collegeList}}
+                    <option value={{college}}>{{college}}</option>
+                {{/each}}
+                </select>
+                
                 <input type="submit" value="Register" id="register">
+
+                
         </form>
     <a href="/user/login">Already have an account? Click here to log-in</a>    
     </div>
