@@ -5,8 +5,14 @@ const cookieParser = require('cookie-parser');
 const configRoutes = require('./routes');
 const session = require('express-session');
 const exphbs = require('express-handlebars');
+const path = require('path');
 
 app.use(cookieParser());
+
+const viewsPath = path.join(__dirname, './views');
+
+// Setup handlebars engine and veiws location
+app.set('views', viewsPath);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

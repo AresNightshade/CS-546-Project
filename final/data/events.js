@@ -1,4 +1,4 @@
-const helpers = require('../helpers');
+const helpers = require('../../helpers');
 const users = require('./users');
 const mongoCollections = require('../config/mongoCollections');
 const user_collection = mongoCollections.user_collection;
@@ -21,7 +21,7 @@ const createEvent = async (
 	helpers.errorIfNotProperString(location, 'location');
 	helpers.errorIfNotProperDateTime(startTime);
 	helpers.errorIfNotProperDateTime(endTime);
-	if (Date.parse(startTime) >= Date.parse(startTime)) {
+	if (Date.parse(startTime) >= Date.parse(endTime)) {
 		throw `StartTime can't after endTime`;
 	}
 
@@ -31,8 +31,10 @@ const createEvent = async (
 	let user = await users.getUserData(postedBy);
 	if (!user) throw `No user present with userName: ${postedBy}`;
 
-	helpers.errorIfNotProperString(tags, 'Tags');
-	tags = tags.split(',');
+	if (tags) {
+		helpers.errorIfNotProperString(tags, 'Tags');
+		tags = tags.split(',');
+	}
 	helpers.errorIfNotProperString(description, 'description');
 
 	//	helpers.errorIfNotProperString(college, 'college');
@@ -72,4 +74,17 @@ const createEvent = async (
 	}
 };
 
-module.exports = { createEvent };
+const findAllEvent = async (filter) => {
+	//
+	const event_collection_c = await event_collection();
+	let eventList = await event_collection_c.find(filter).toArray();
+	if (!eventList) throw 'Could not get all movies';
+	//ObjectID to String
+	eventList = eventList.map(function (val) {
+		val['_id'] = val['_id'].toString();
+		return val;
+	});
+
+	return eventList;
+};
+module.exports = { createEvent, findAllEvent };

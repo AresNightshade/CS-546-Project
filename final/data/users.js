@@ -1,14 +1,25 @@
 const mongoCollections = require('../config/mongoCollections');
-const helpers = require('../helpers');
+const helpers = require('../../helpers');
 const user_collection = mongoCollections.user_collection;
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
+const collegeList = require('./index').college_list;
 
 const createUser = async (username, password, firstName, lastName, college) => {
 	helpers.errorIfNotProperUserName(username, 'usernames');
 	helpers.errorIfNotProperPassword(password, 'password');
 	helpers.errorIfNotProperName(firstName, 'firstName');
 	helpers.errorIfNotProperName(lastName, 'lastName');
+
+	let correct_college = false;
+	for (var i = 0; i < collegeList.length; i++) {
+		let coll = collegeList[i].college;
+		if (coll == college) {
+			correct_college = true;
+			break;
+		}
+	}
+	if (correct_college == false) throw `Incorrect College Name Entered`;
 
 	username.trim();
 	password.trim();

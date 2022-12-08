@@ -3,7 +3,7 @@ const user_collection = mongoCollections.user_collection;
 const event_collection = mongoCollections.event_collection;
 const { ObjectId } = require('mongodb');
 
-const helpers = require('../helpers');
+const helpers = require('../../helpers');
 const eventData = require('./events');
 
 const createComment = async (eventID, userID, comment) => {
@@ -24,19 +24,16 @@ const createComment = async (eventID, userID, comment) => {
 	let user = await user_collection_c.findOne({ _id: ObjectId(userID) });
 	if (!user) throw `No user present with id: ${userID}`;
 
-	//reviewDate
 	//from stack overflow
-	let today = new Date();
-	let dd = String(today.getDate()).padStart(2, '0');
-	let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-	let yyyy = today.getFullYear();
 
-	let commentDate = mm + '/' + dd + '/' + yyyy;
+	// let tzoffset = new Date().getTimezoneOffset() * 60000; //offset in milliseconds
+	// let localISOTime = new Date(Date.now() - tzoffset).toISOString().slice(0, -1);
+	// let commentDate = localISOTime;
 
 	let commentID = new ObjectId();
 	let newReview = {
 		_id: commentID,
-		commentDate: commentDate,
+		commentDate: new Date(),
 		userID: userID,
 		body: comment,
 	};

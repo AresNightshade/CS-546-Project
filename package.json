@@ -4,18 +4,8 @@
   "description": "CS 546 Final Project",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node final/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/A-very-Cunning-ham/CS-546-Group-Project.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/A-very-Cunning-ham/CS-546-Group-Project/issues"
-  },
-  "homepage": "https://github.com/A-very-Cunning-ham/CS-546-Group-Project#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
