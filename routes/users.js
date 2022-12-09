@@ -26,7 +26,7 @@ router
 			let result = await usersData.checkUser(userName, password);
 
 			if (result.authenticatedUser) {
-				req.session.user = result.user.userName;
+				req.session.user = userName;
 				return res.redirect('/');
 			} else {
 				res.status(500).render('userLogin', {

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const helpers = require('../helpers');
 const data = require('../data');
-const usersData = data.users;
+const eventData = data.events;
 
 router.route('/').get(async (req, res) => {
 	//code here for GET
@@ -18,7 +18,7 @@ router
 			//
 			res.render('createEvent', { title: 'Create Event' });
 		} else {
-			res.redirect('/');
+			res.render('createEventNoUser', { title: 'Create Event' });
 		}
 	})
 	.post(async (req, res) => {
@@ -31,7 +31,8 @@ router
 			let tags = req.body.tagsInput;
 			let description = req.body.descriptionInput;
 			let capacity = req.body.capacityInput;
-			createEvent(
+			let image = req.body.image;
+			await eventData.createEvent(
 				eventName,
 				location,
 				startTime,
@@ -39,10 +40,11 @@ router
 				req.session.user,
 				tags,
 				description,
-				capacity
+				capacity,
+				image
 			);
 		} else {
-			res.redirect('/');
+			res.render('createEventNoUser', { title: 'Create Event' });
 		}
 	});
 module.exports = router;

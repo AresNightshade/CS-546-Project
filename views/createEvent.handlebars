@@ -18,7 +18,7 @@ You will also have a link on this page that links to '/' and has the text "Alrea
     {{/if}}
     <br/>
     <div>
-        <form action="/event/createEvent" method="POST" id="registration-form">
+        <form action="/event/createEvent" method="POST" id="createEvent-form">
                 <label for="eventNameInput">Event Name:</label>
                 <input type="text" name="eventNameInput" id="eventNameInput">
                 <br>
@@ -38,8 +38,116 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <input type="text" name="descriptionInput" id="descriptionInput">
                 <br>
                 <label for="capacityInput">Capacity:</label>
-                <input type="number" name="capacityInput" id="capacityInput">
+                <input type="number" name="capacityInput" id="capacityInput" min="1" step="1">
                 <br>
-                <input type="submit" value="Register" id="register">
+                <br>
+
+                <label for="image">Select an image to upload for the event:</label>
+                <input type="file" id="image" name="image"><br>
+
+                <input type="submit" value="createEvent" id="createEvent">
         </form>
     </div>
+
+  <style>
+ form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  width: 50%;
+  padding: 2rem;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+input {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#createEvent {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#createEvent:hover {
+  background-color: #45a049;
+}
+
+form {
+  background-color: #f2f2f2;
+}
+
+
+</style>
+
+<script>
+  // Get references to the form and input fields
+  const createEventForm = document.querySelector('#createEvent-form');
+  const eventNameInput = document.querySelector('#eventNameInput');
+  const locationInput = document.querySelector('#locationInput');
+  const startTimeInput = document.querySelector('#startTimeInput');
+  const endTimeInput = document.querySelector('#endTimeInput');
+  const descriptionInput = document.querySelector('#descriptionInput');
+  const capacityInput = document.querySelector('#capacityInput');
+  
+
+
+
+
+  // Function to validate the form input
+  function validateForm() {
+
+    if (eventNameInput.value.trim() === '') {
+      alert('Please enter Event Name');
+      return false;
+    }
+
+    if (locationInput.value.trim() === '') {
+      alert('Please enter the Location');
+      return false;
+    }
+
+    if (startTimeInput.value.trim() === '') {
+      alert('Please enter Start Time');
+      return false;
+    }
+
+    if (endTimeInput.value.trim() === '') {
+      alert('Please enter End Time');
+      return false;
+    }
+
+    if (descriptionInput.value.trim() === '') {
+      alert('Please enter the Description');
+      return false;
+    }
+
+
+    if (capacityInput.value.trim() === '') {
+      alert('Please enter the capacity');
+      return false;
+    }
+
+    // If all the checks pass, allow the form to be submitted
+    return true;
+  }
+
+  // Add an event listener to the form to validate the input when the form is submitted
+  createEventForm.addEventListener('submit', (event) => {
+    // prevent the form from being submitted if the input is invalid
+    if (!validateForm()) {
+      event.preventDefault();
+    }
+  });
+</script>
