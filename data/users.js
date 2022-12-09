@@ -1,9 +1,9 @@
 const mongoCollections = require('../config/mongoCollections');
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const user_collection = mongoCollections.user_collection;
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
-const collegeList = require('./index').college_list;
+const { collegeList } = require('./const_data');
 
 const createUser = async (username, password, firstName, lastName, college) => {
 	helpers.errorIfNotProperUserName(username, 'usernames');

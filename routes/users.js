@@ -1,10 +1,10 @@
 //require express, express router and bcrypt as shown in lecture code
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const data = require('../data');
 const usersData = data.users;
-const collegeList = data.college_list;
+const { collegeList } = data;
 
 router
 	.route('/login')
@@ -84,6 +84,10 @@ router
 					collegeList: collegeList,
 					error: true,
 					error_message: `Internal Server Error`,
+					userName: userName,
+					firstName: firstName,
+					lastName: lastName,
+					college: college,
 				});
 			}
 		} catch (e) {
@@ -92,6 +96,10 @@ router
 				collegeList: collegeList,
 				error: true,
 				error_message: e,
+				userName: userName,
+				firstName: firstName,
+				lastName: lastName,
+				college: college,
 			});
 		}
 	});

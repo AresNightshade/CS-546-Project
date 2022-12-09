@@ -1,4 +1,4 @@
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const users = require('./users');
 const mongoCollections = require('../config/mongoCollections');
 const user_collection = mongoCollections.user_collection;
