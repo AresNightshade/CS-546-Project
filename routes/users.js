@@ -39,7 +39,7 @@ router
 			res.status(400).render('userLogin', {
 				title: 'Login',
 				error: true,
-				error_message: e,
+				error_message: `Either the username or password is invalid`,
 			});
 		}
 	});
