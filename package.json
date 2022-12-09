@@ -4,7 +4,7 @@
   "description": "CS 546 Final Project",
   "main": "index.js",
   "scripts": {
-    "start": "node final/app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
