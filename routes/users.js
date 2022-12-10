@@ -11,11 +11,11 @@ router
 	.route('/login')
 	.get(async (req, res) => {
 		//code here for GET
-		req.session.user = 'farhan';
+		//		req.session.user = 'farhan';
 		if (req.session.user) {
 			return res.redirect('/');
 		} else {
-			res.render('userLogin', { title: 'Login' });
+			res.render('userLogin', { title: 'Login', pageName: 'userLogin' });
 		}
 	})
 	.post(async (req, res) => {
@@ -37,6 +37,7 @@ router
 				} else {
 					res.status(500).render('userLogin', {
 						title: 'Login',
+						pageName: 'userLogin',
 						error: true,
 						error_message: `Internal Server Error`,
 					});
@@ -44,6 +45,7 @@ router
 			} catch (e) {
 				res.status(400).render('userLogin', {
 					title: 'Login',
+					pageName: 'userLogin',
 					error: true,
 					error_message: `Either the username or password is invalid`,
 				});
@@ -60,6 +62,7 @@ router
 		} else {
 			res.render('userRegister', {
 				title: 'Register',
+				pageName: 'userRegister',
 				collegeList: collegeList,
 			});
 		}
@@ -92,6 +95,7 @@ router
 				} else {
 					res.status(500).render('userRegister', {
 						title: 'Register',
+						pageName: 'userRegister',
 						collegeList: collegeList,
 						error: true,
 						error_message: `Internal Server Error`,
@@ -104,6 +108,7 @@ router
 			} catch (e) {
 				res.status(400).render('userRegister', {
 					title: 'Register',
+					pageName: 'userRegister',
 					collegeList: collegeList,
 					error: true,
 					error_message: e,

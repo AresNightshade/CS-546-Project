@@ -12,4 +12,23 @@ You will also have a link on this page that links to '/' and has the text "Alrea
 
 --}}
 
-    
+<h1>Event RSVP Platform</h1>
+{{#if userPresent}}
+<p>Welcome back, {{userName}}!</p>
+<a href="/user/logout">Log Out</a>
+<br>
+<a href="/event/createEvent">Create Event</a>
+{{else}}
+<p>Please <a href="/user/login">Log In</a> or <a href="/user/register">Register</a></p>
+{{/if}}
+
+<h2> Events</h2>
+<ul>
+{{#each eventList}}
+    <li>
+        <article>
+            {{eventName}}
+        </article>
+    </li>
+{{/each}}
+</ul>

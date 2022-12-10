@@ -34,7 +34,7 @@ const createComment = async (eventID, userID, comment) => {
 	let commentID = new ObjectId();
 	let newReview = {
 		_id: commentID,
-		commentDate: localDateTime,
+		commentDate: new Date(),
 		userID: userID,
 		body: comment,
 	};

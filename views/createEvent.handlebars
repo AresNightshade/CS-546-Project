@@ -1,21 +1,10 @@
-{{!--
 
-If the user is NOT logged in, and 'GET /register' endpoint is called, you will render this sign-up form view that displays two input (one for the username and one for password):
--The form will be used to submit the POST request to the '/register' route on the server and must have an 'id' of 'registration-form'
--The input for the username must have a 'name' and 'id' of 'usernameInput'
--The input for the password must have a 'name' and 'id' of 'passwordInput' and should be an input type of password.
-
-Do not forget to use labels for your inputs! For the labels, you will use the method of using the 'for' attribute. 
-You should have a label for both the username and password inputs referencing their id's in the for attribute of the label
-
-You will also have a link on this page that links to '/' and has the text "Already have an account? Click here to log-in"
-
---}}
 
         <h1>Create Event</h1>
     {{#if error}}
         <p>{{error_message}}</p>
     {{/if}}
+     <a href="/">Home Page</a>    
     <br/>
     <div>
         <form action="/event/createEvent" method="POST" id="createEvent-form">
@@ -43,115 +32,10 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <br>
 
                 <label for="image">Select an image to upload for the event:</label>
-                <input type="file" id="image" name="image"><br>
+                <input type="file" id="image" name="image" accept="image/*"><br>
 
                 <input type="submit" value="createEvent" id="createEvent">
         </form>
     </div>
 
-  <style>
- form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-  width: 50%;
-  padding: 2rem;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-input {
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-#createEvent {
-  background-color: #4CAF50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-#createEvent:hover {
-  background-color: #45a049;
-}
-
-form {
-  background-color: #f2f2f2;
-}
-
-
-</style>
-
-<script>
-  // Get references to the form and input fields
-  const createEventForm = document.querySelector('#createEvent-form');
-  const eventNameInput = document.querySelector('#eventNameInput');
-  const locationInput = document.querySelector('#locationInput');
-  const startTimeInput = document.querySelector('#startTimeInput');
-  const endTimeInput = document.querySelector('#endTimeInput');
-  const descriptionInput = document.querySelector('#descriptionInput');
-  const capacityInput = document.querySelector('#capacityInput');
-  
-
-
-
-
-  // Function to validate the form input
-  function validateForm() {
-
-    if (eventNameInput.value.trim() === '') {
-      alert('Please enter Event Name');
-      return false;
-    }
-
-    if (locationInput.value.trim() === '') {
-      alert('Please enter the Location');
-      return false;
-    }
-
-    if (startTimeInput.value.trim() === '') {
-      alert('Please enter Start Time');
-      return false;
-    }
-
-    if (endTimeInput.value.trim() === '') {
-      alert('Please enter End Time');
-      return false;
-    }
-
-    if (descriptionInput.value.trim() === '') {
-      alert('Please enter the Description');
-      return false;
-    }
-
-
-    if (capacityInput.value.trim() === '') {
-      alert('Please enter the capacity');
-      return false;
-    }
-
-    if (Date.parse(startTimeInput) >= Date.parse(endTimeInput)) {
-        alert(`StartTime can't after endTime`);
-        return false;
-      }
-    // If all the checks pass, allow the form to be submitted
-    return true;
-  }
-
-  // Add an event listener to the form to validate the input when the form is submitted
-  createEventForm.addEventListener('submit', (event) => {
-    // prevent the form from being submitted if the input is invalid
-    if (!validateForm()) {
-      event.preventDefault();
-    }
-  });
-</script>
+<script src="/public/js/createEvent.js"></script>

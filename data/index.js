@@ -4,6 +4,7 @@ const comments = require('./comments');
 const events = require('./events');
 const { collegeList } = require('./const_data');
 const { localDateTime } = require('./const_data');
+const getLocalTime = require('./const_data').getLocalTime;
 
 module.exports = {
 	users,
@@ -11,4 +12,5 @@ module.exports = {
 	events,
 	collegeList,
 	localDateTime,
+	getLocalTime,
 };

@@ -26,7 +26,6 @@ const createEvent = async (
 		throw `StartTime can't after endTime`;
 	}
 
-	//check if user exists
 	helpers.errorIfNotProperUserName(postedBy, 'postedBy');
 	postedBy = postedBy.trim();
 	let user = await users.getUserData(postedBy);
@@ -51,8 +50,8 @@ const createEvent = async (
 	let new_event = {
 		eventName: eventName,
 		location: location,
-		startTime: startTime,
-		endTime: endTime,
+		startTime: new Date(startTime),
+		endTime: new Date(endTime),
 		postedBy: postedBy,
 		tags: tags,
 		description: description,
@@ -80,10 +79,9 @@ const createEvent = async (
 
 const findAllEvent = async (filter) => {
 	//
+
 	const event_collection_c = await event_collection();
 	let eventList = await event_collection_c.find(filter).toArray();
-	if (!eventList) throw 'Could not get all movies';
-	//ObjectID to String
 	eventList = eventList.map(function (val) {
 		val['_id'] = val['_id'].toString();
 		return val;

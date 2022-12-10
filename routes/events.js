@@ -4,12 +4,32 @@ const router = express.Router();
 const helpers = require('../helpers');
 const data = require('../data');
 const eventData = data.events;
+const userData = data.users;
 const { collegeList } = data;
 const { localDateTime } = data;
 
 router.route('/').get(async (req, res) => {
 	//code here for GET
-	res.render('Temp', { title: 'Event Registration Portal' });
+	let filter = { endTime: { $gt: new Date() } };
+	if (req.session.user) {
+		let user = await userData.getUserData(req.session.user);
+		filter.college = user.college;
+		let eventList = await eventData.findAllEvent(filter);
+
+		res.render('homePage', {
+			title: 'RSVP',
+			eventList: eventList,
+			userPresent: true,
+			userName: req.session.user,
+		});
+	} else {
+		let eventList = await eventData.findAllEvent(filter);
+		res.render('homePage', {
+			title: 'RSVP',
+			userPresent: false,
+			eventList: eventList,
+		});
+	}
 });
 
 router
@@ -24,6 +44,7 @@ router
 
 			res.render('createEvent', {
 				title: 'Create Event',
+				pageName: 'createEvent',
 				minDateTimeString: minDateTimeString,
 			});
 		} else {
@@ -48,9 +69,19 @@ router
 					helpers.errorIfNotProperString(location, 'location');
 					helpers.errorIfNotProperDateTime(startTime);
 					helpers.errorIfNotProperDateTime(endTime);
-					if (Date.parse(startTime) >= Date.parse(endTime)) {
-						throw `StartTime can't after endTime`;
+
+					let start = new Date(startTime.value).getTime();
+					let end = new Date(endTime.value).getTime();
+					let diff_ms = end - start;
+					let diff_days = diff_ms / (24 * 60 * 60 * 1000);
+
+					if (diff_days < 0) {
+						throw `Start time can't after End time`;
 					}
+					if (diff_days > 1) {
+						throw `Event duration can't more than 24 hrs`;
+					}
+
 					helpers.errorIfStringIsNotNumber(capacity);
 					capacity = parseFloat(capacity);
 
@@ -60,6 +91,7 @@ router
 				} catch (e) {
 					res.render('createEvent', {
 						title: 'Create Event',
+						pageName: 'createEvent',
 						error: true,
 						error_message: e,
 					});
@@ -82,9 +114,9 @@ router
 				res.render('createEventNoUser', { title: 'Not Authorized' });
 			}
 		} catch (e) {
-			console.log(e);
 			res.render('createEvent', {
 				title: 'Create Event',
+				pageName: 'createEvent',
 				error: true,
 				error_message: `Internal Server Error`,
 			});

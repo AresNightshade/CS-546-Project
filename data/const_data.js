@@ -10,9 +10,12 @@ const collegeList = [
 	},
 ];
 
-function getCurrentTime(timeZone) {
+function getLocalTime(now, timeZone_fn) {
 	// get current time in UTC
-	const now = new Date();
+	//	const now = new Date();
+	// if (!timeZone_fn) {
+	// 	let timeZone_fn = new Date().toString().match(/\(([A-Za-z\s].*)\)/)[1];
+	// }
 
 	// calculate time zone offset, in minutes, from UTC
 	const timeZoneOffset = -now.getTimezoneOffset();
@@ -30,11 +33,10 @@ function getCurrentTime(timeZone) {
 	return localTime;
 }
 
-const now = new Date();
-const timeZone = now.toString().match(/\(([A-Za-z\s].*)\)/)[1];
-const localDateTime = getCurrentTime(timeZone);
+const localDateTime = getLocalTime(new Date());
 
 module.exports = {
 	collegeList,
 	localDateTime,
+	getLocalTime,
 };
