@@ -26,10 +26,10 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <input type="text" name="locationInput" id="locationInput">
                 <br>
                 <label for="startTimeInput">Start Time:</label>
-                <input type="datetime-local" name="startTimeInput" id="startTimeInput">
+                <input type="datetime-local" name="startTimeInput" id="startTimeInput" min ={{minDateTimeString}}>
                 <br>
                 <label for="endTimeInput">End Time:</label>
-                <input type="datetime-local" name="endTimeInput" id="endTimeInput">
+                <input type="datetime-local" name="endTimeInput" id="endTimeInput" min ={{minDateTimeString}}>
                 <br>
                 <label for="tagsInput">Comma Seperated Tags:</label>
                 <input type="text" name="tagsInput" id="tagsInput">
@@ -139,6 +139,10 @@ form {
       return false;
     }
 
+    if (Date.parse(startTimeInput) >= Date.parse(endTimeInput)) {
+        alert(`StartTime can't after endTime`);
+        return false;
+      }
     // If all the checks pass, allow the form to be submitted
     return true;
   }

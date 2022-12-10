@@ -3,6 +3,7 @@ const users = require('./users');
 const mongoCollections = require('../config/mongoCollections');
 const user_collection = mongoCollections.user_collection;
 const event_collection = mongoCollections.event_collection;
+const { ObjectId } = require('mongodb');
 
 const createEvent = async (
 	eventName,
@@ -40,8 +41,8 @@ const createEvent = async (
 	//	helpers.errorIfNotProperString(college, 'college');
 	college = user.college;
 
-	helpers.errorIfStringIsNotNumber(capacity);
-	capacity = parseFloat(capacity);
+	//	helpers.errorIfStringIsNotNumber(capacity);
+	//	capacity = parseFloat(capacity);
 
 	if (capacity < 1 || capacity % 1 > 0) {
 		throw `Invalid Capacity provided`;
@@ -69,9 +70,12 @@ const createEvent = async (
 
 	if (insertInfo.insertedCount === 0) {
 		throw `Server Error`;
-	} else {
-		return { eventInserted: true };
 	}
+
+	let newEventId = insertInfo.insertedId.toString();
+	let event = getEventData(newEventId);
+
+	return event;
 };
 
 const findAllEvent = async (filter) => {
@@ -87,4 +91,19 @@ const findAllEvent = async (filter) => {
 
 	return eventList;
 };
-module.exports = { createEvent, findAllEvent };
+
+const getEventData = async (eventID) => {
+	//
+	try {
+		helpers.errorIfNotProperID(eventID, 'eventID');
+	} catch (e) {
+		throw `Incorrect eventID`;
+	}
+
+	const event_collection_c = await event_collection();
+	let event = await event_collection_c.findOne({ _id: ObjectId(eventID) });
+	if (!event) throw `Event not present`;
+
+	return event;
+};
+module.exports = { createEvent, findAllEvent, getEventData };

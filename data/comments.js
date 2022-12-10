@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 
 const helpers = require('../helpers');
 const eventData = require('./events');
+const { localDateTime } = require('./const_data');
 
 const createComment = async (eventID, userID, comment) => {
 	const user_collection_c = await user_collection();
@@ -33,7 +34,7 @@ const createComment = async (eventID, userID, comment) => {
 	let commentID = new ObjectId();
 	let newReview = {
 		_id: commentID,
-		commentDate: new Date(),
+		commentDate: localDateTime,
 		userID: userID,
 		body: comment,
 	};
