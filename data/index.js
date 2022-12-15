@@ -2,21 +2,15 @@
 const users = require('./users');
 const comments = require('./comments');
 const events = require('./events');
+const { collegeList } = require('./const_data');
+const { localDateTime } = require('./const_data');
+const getLocalTime = require('./const_data').getLocalTime;
 
-const college_list = [
-	{
-		college: 'Stevens Institute of Technology',
-	},
-	{
-		college: 'New York University',
-	},
-	{
-		college: 'Rutgers University',
-	},
-];
 module.exports = {
 	users,
 	comments,
 	events,
-	college_list,
+	collegeList,
+	localDateTime,
+	getLocalTime,
 };

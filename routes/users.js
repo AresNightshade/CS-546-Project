@@ -1,46 +1,55 @@
 //require express, express router and bcrypt as shown in lecture code
 const express = require('express');
 const router = express.Router();
-const helpers = require('../../helpers');
+const helpers = require('../helpers');
 const data = require('../data');
 const usersData = data.users;
-const collegeList = data.college_list;
+const { collegeList } = data;
+const { localDateTime } = data;
 
 router
 	.route('/login')
 	.get(async (req, res) => {
 		//code here for GET
+		req.session.user = 'farhan';
 		if (req.session.user) {
 			return res.redirect('/');
 		} else {
-			res.render('userLogin', { title: 'Login' });
+			res.render('userLogin', { title: 'Login', pageName: 'userLogin' });
 		}
 	})
 	.post(async (req, res) => {
 		//code here for POST
-		let userName = req.body.usernameInput;
-		let password = req.body.passwordInput;
-		try {
-			helpers.errorIfNotProperUserName(userName, 'usernames');
-			helpers.errorIfNotProperPassword(password, 'password');
-			let result = await usersData.checkUser(userName, password);
+		if (req.session.user) {
+			return res.redirect('/');
+		} else {
+			let userName = req.body.usernameInput;
+			let password = req.body.passwordInput;
+			try {
+				helpers.errorIfNotProperUserName(userName, 'usernames');
+				helpers.errorIfNotProperPassword(password, 'password');
+				userName = userName.toLowerCase();
+				let result = await usersData.checkUser(userName, password);
 
-			if (result.authenticatedUser) {
-				req.session.user = result.user.userName;
-				return res.redirect('/');
-			} else {
-				res.status(500).render('userLogin', {
+				if (result.authenticatedUser) {
+					req.session.user = userName;
+					return res.redirect('/');
+				} else {
+					res.status(500).render('userLogin', {
+						title: 'Login',
+						pageName: 'userLogin',
+						error: true,
+						error_message: `Internal Server Error`,
+					});
+				}
+			} catch (e) {
+				res.status(400).render('userLogin', {
 					title: 'Login',
+					pageName: 'userLogin',
 					error: true,
-					error_message: `Internal Server Error`,
+					error_message: `Either the username or password is invalid`,
 				});
 			}
-		} catch (e) {
-			res.status(400).render('userLogin', {
-				title: 'Login',
-				error: true,
-				error_message: `Either the username or password is invalid`,
-			});
 		}
 	});
 
@@ -53,46 +62,62 @@ router
 		} else {
 			res.render('userRegister', {
 				title: 'Register',
+				pageName: 'userRegister',
 				collegeList: collegeList,
 			});
 		}
 	})
 	.post(async (req, res) => {
 		//code here for POST
-		let userName = req.body.usernameInput;
-		let password = req.body.passwordInput;
+		if (req.session.user) {
+			return res.redirect('/');
+		} else {
+			let userName = req.body.usernameInput;
+			let password = req.body.passwordInput;
 
-		let firstName = req.body.firstNameInput;
-		let lastName = req.body.lastNameInput;
-		let college = req.body.collegeNameInput;
+			let firstName = req.body.firstNameInput;
+			let lastName = req.body.lastNameInput;
+			let college = req.body.collegeNameInput;
 
-		try {
-			helpers.errorIfNotProperUserName(userName, 'usernames');
-			helpers.errorIfNotProperPassword(password, 'password');
-			let result = await usersData.createUser(
-				userName,
-				password,
-				firstName,
-				lastName,
-				college
-			);
-			if (result.userInserted) {
-				return res.redirect('/user/login');
-			} else {
-				res.status(500).render('userRegister', {
+			try {
+				helpers.errorIfNotProperUserName(userName, 'usernames');
+				helpers.errorIfNotProperPassword(password, 'password');
+				userName = userName.toLowerCase();
+				let result = await usersData.createUser(
+					userName,
+					password,
+					firstName,
+					lastName,
+					college
+				);
+				if (result.userInserted) {
+					return res.redirect('/user/login');
+				} else {
+					res.status(500).render('userRegister', {
+						title: 'Register',
+						pageName: 'userRegister',
+						collegeList: collegeList,
+						error: true,
+						error_message: `Internal Server Error`,
+						userName: userName,
+						firstName: firstName,
+						lastName: lastName,
+						college: college,
+					});
+				}
+			} catch (e) {
+				res.status(400).render('userRegister', {
 					title: 'Register',
+					pageName: 'userRegister',
 					collegeList: collegeList,
 					error: true,
-					error_message: `Internal Server Error`,
+					error_message: e,
+					userName: userName,
+					firstName: firstName,
+					lastName: lastName,
+					college: college,
 				});
 			}
-		} catch (e) {
-			res.status(400).render('userRegister', {
-				title: 'Register',
-				collegeList: collegeList,
-				error: true,
-				error_message: e,
-			});
 		}
 	});
 

@@ -1,24 +1,13 @@
-{{!--
 
-If the user is NOT logged in, and 'GET /register' endpoint is called, you will render this sign-up form view that displays two input (one for the username and one for password):
--The form will be used to submit the POST request to the '/register' route on the server and must have an 'id' of 'registration-form'
--The input for the username must have a 'name' and 'id' of 'usernameInput'
--The input for the password must have a 'name' and 'id' of 'passwordInput' and should be an input type of password.
-
-Do not forget to use labels for your inputs! For the labels, you will use the method of using the 'for' attribute. 
-You should have a label for both the username and password inputs referencing their id's in the for attribute of the label
-
-You will also have a link on this page that links to '/' and has the text "Already have an account? Click here to log-in"
-
---}}
 
         <h1>Create Event</h1>
     {{#if error}}
         <p>{{error_message}}</p>
     {{/if}}
+     <a href="/">Home Page</a>    
     <br/>
     <div>
-        <form action="/event/createEvent" method="POST" id="registration-form">
+        <form action="/event/createEvent" method="POST" id="createEvent-form">
                 <label for="eventNameInput">Event Name:</label>
                 <input type="text" name="eventNameInput" id="eventNameInput">
                 <br>
@@ -26,10 +15,10 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <input type="text" name="locationInput" id="locationInput">
                 <br>
                 <label for="startTimeInput">Start Time:</label>
-                <input type="datetime-local" name="startTimeInput" id="startTimeInput">
+                <input type="datetime-local" name="startTimeInput" id="startTimeInput" min ={{minDateStartTimeString}}>
                 <br>
                 <label for="endTimeInput">End Time:</label>
-                <input type="datetime-local" name="endTimeInput" id="endTimeInput">
+                <input type="datetime-local" name="endTimeInput" id="endTimeInput" max ={{maxDateEndTimeString}}>
                 <br>
                 <label for="tagsInput">Comma Seperated Tags:</label>
                 <input type="text" name="tagsInput" id="tagsInput">
@@ -38,8 +27,15 @@ You will also have a link on this page that links to '/' and has the text "Alrea
                 <input type="text" name="descriptionInput" id="descriptionInput">
                 <br>
                 <label for="capacityInput">Capacity:</label>
-                <input type="number" name="capacityInput" id="capacityInput">
+                <input type="number" name="capacityInput" id="capacityInput" min="1" step="1">
                 <br>
-                <input type="submit" value="Register" id="register">
+                <br>
+
+                <label for="image">Select an image to upload for the event:</label>
+                <input type="file" id="image" name="image" accept="image/*"><br>
+
+                <input type="submit" value="createEvent" id="createEvent">
         </form>
     </div>
+
+<script src="/public/js/createEvent.js"></script>

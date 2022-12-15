@@ -12,8 +12,21 @@ You will also have a link on this page that links to '/' and has the text "Alrea
 
 --}}
 
-<a href="/user/login">Already have an account? Click here to log-in</a> 
-<br>   
-<a href="/user/register">Click here to register!</a>    
-<br>
-<a href="/event/createEvent">Click here to Create an Event!</a>    
+<h1>
+    {{head}}
+</h1>
+{{message}}
+<a href="/user/login">Click here to log-in</a>    
+
+<style>
+    h1 {
+  color: red;
+  text-align: center;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+</style>
+

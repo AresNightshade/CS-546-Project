@@ -1,15 +1,31 @@
-{{!--
+<h1>Event RSVP Platform</h1>
 
-If the user is NOT logged in, and 'GET /register' endpoint is called, you will render this sign-up form view that displays two input (one for the username and one for password):
--The form will be used to submit the POST request to the '/register' route on the server and must have an 'id' of 'registration-form'
--The input for the username must have a 'name' and 'id' of 'usernameInput'
--The input for the password must have a 'name' and 'id' of 'passwordInput' and should be an input type of password.
+{{#if userPresent}}
+  <p>Welcome back, {{userName}}!</p>
+  <a href="/user/logout">Log Out</a>
+  <br>
+  <a href="/event/createEvent">Create Event</a>
+{{else}}
+  <p>Please <a href="/user/login">Log In</a> or <a href="/user/register">Register</a></p>
+{{/if}}
 
-Do not forget to use labels for your inputs! For the labels, you will use the method of using the 'for' attribute. 
-You should have a label for both the username and password inputs referencing their id's in the for attribute of the label
+<h2>Upcoming Events</h2>
 
-You will also have a link on this page that links to '/' and has the text "Already have an account? Click here to log-in"
-
---}}
-
-    
+{{#if eventList}}
+  <ul>
+    {{#each eventList}}
+      <li>
+        <article>
+          <a href={{eventLink}}><h3>{{eventName}}</h3></a>
+          <p>
+            Start Time: {{formatDate startTime "YYYY-MM-DD hh:mm"}}<br>
+            End Time: {{formatDate endTime "YYYY-MM-DD hh:mm"}}<br>
+            Posted By: {{postedBy}}
+          </p>
+        </article>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>There are no upcoming events at this time.</p>
+{{/if}}

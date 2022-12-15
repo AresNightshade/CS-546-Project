@@ -173,53 +173,8 @@ function errorIfNotProperID(val, variableName) {
 function errorIfNotProperDateTime(val, variableName) {
 	errorIfNotProperString(val, variableName);
 	val = val.trim();
-	//{
-	//'2017-06-01T08:30'
-	// let dateTime = [];
-	// dateTime = val.spit('T');
-	// if (dateTime.length !== 2) throw `Not Proper DateTime Format`;
-	// let date = dateTime[0].split('-');
-	// let time = dateTime[1].split(':');
 
-	// if (date.length !== 3) throw `Not Proper DateTime Format`;
-	// if (time.length !== 2) throw `Not Proper DateTime Format`;
-
-	// let year = date[0];
-	// errorIfStringIsNotNumber(year, 'year', `Not Proper DateTime Format`);
-	// year = parseInt(year);
-
-	// let month = date[1];
-	// errorIfStringIsNotNumber(month, 'month', `Not Proper DateTime Format`);
-	// month = parseInt(month);
-
-	// let day = date[2];
-	// errorIfStringIsNotNumber(day, 'day', `Not Proper DateTime Format`);
-	// day = parseInt(day);
-
-	// let hr = date[0];
-	// errorIfStringIsNotNumber(hr, 'hr', `Not Proper DateTime Format`);
-	// hr = parseInt(hr);
-
-	// let min = date[1];
-	// errorIfStringIsNotNumber(min, 'min', `Not Proper DateTime Format`);
-	// min = parseInt(min);
-
-	// let currentTime = new Date();
-	// if (
-	// 	year > currentTime.getFullYear() + 1 ||
-	// 	year < currentTime.getFullYear()
-	// ) {
-	// 	throw `Not Proper DateTime Format`;
-	// }
-
-	// if (month < 1 || month > 12) throw `Not Proper DateTime Format`;
-	// if (day < 1 || day > 12) throw `Not Proper DateTime Format`;
-
-	// if (month < 1 || month > 12) throw `Not Proper DateTime Format`;
-	// if (month < 1 || month > 12) throw `Not Proper DateTime Format`;
-	//}
-
-	let temp = Date.parse(dateString);
+	let temp = Date.parse(val);
 	if (!temp) throw `Not Proper DateTime `;
 
 	let currentDateTimeString = Date.parse(new Date().toLocaleString('est'));

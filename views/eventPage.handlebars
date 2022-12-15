@@ -1,0 +1,78 @@
+{{#each eventList}}
+
+  {{#if userPresent}}
+    <p>Welcome back, {{userName}}!</p>
+  {{else}}
+    <p>Please <a href="/user/login">Log In</a> or <a href="/user/register">Register</a></p>
+  {{/if}}
+  <a href="/">Home</a>
+
+  {{#if error}}
+          <p>{{error_message}}</p>
+  {{/if}}
+
+
+
+  <article>
+    <h2>{{eventName}}</h2>
+    <p>
+      Start Time: {{formatDate startTime "YYYY-MM-DD hh:mm"}}<br>
+      End Time: {{formatDate endTime "YYYY-MM-DD hh:mm"}}<br>
+      Description: {{description}}<br>
+      Location: {{location}}<br>
+      Posted By: {{postedBy}}<br>
+    </p>
+  </article>
+  
+  {{#each comments}}
+    <h6>{{userName}}</h6> commented on {{commentDate}}
+    <br>
+    <article>
+      {{body}}
+    </article>
+  {{/each}}
+
+  {{#if notOwnerTag}}
+    {{#if userPresent}}
+      
+      {{#if userRegistered}}
+
+        <a href={{deRegisterLink}}>Click here to de-register from the event</a>
+
+      {{else}}
+
+        {{#if capacityLeft}}
+          <a href={{registerLink}}>Click here to register</a>
+        {{else}}
+          Sorry the Event is full
+        {{/if}}
+
+      {{/if}}
+      <br>
+      {{#if userFav}}
+        <a href={{eventFavLink}}>Remove from Fav</a>
+      {{else}}
+        <a href={{eventFavLink}}>Add to Fav</a>
+      {{/if}}
+      
+    {{/if}}
+  {{/if}}
+
+
+  {{#if ownerTag}}
+    <a href={{deleteEvent}}>Delete the Event</a>
+    <br>
+    <a href={{editEvent}}>Edit the Event</a>
+    <br>
+    <h3>Registered User List</h3>
+    {{#if usersRegistered}}
+      <ol>
+      {{#each usersRegistered}}
+        <li>{{this}}</li>
+      {{/each}}
+      </ol>
+    {{else}}
+      <p>No One has registered for the event yet!.</p>
+    {{/if}}
+  {{/if}}
+{{/each}}
