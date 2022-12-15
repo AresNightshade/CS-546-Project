@@ -65,10 +65,14 @@
     <a href={{editEvent}}>Edit the Event</a>
     <br>
     <h3>Registered User List</h3>
-    <ol>
-    {{#each usersRegistered}}
-      <li>{{this}}</li>
-    {{/each}}
-    </ol>
+    {{#if usersRegistered}}
+      <ol>
+      {{#each usersRegistered}}
+        <li>{{this}}</li>
+      {{/each}}
+      </ol>
+    {{else}}
+      <p>No One has registered for the event yet!.</p>
+    {{/if}}
   {{/if}}
 {{/each}}

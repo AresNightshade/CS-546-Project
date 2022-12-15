@@ -127,9 +127,6 @@ const registerForEvent = async (eventID, userName) => {
 		throw 'Sorry! but the event is at full capacity';
 	}
 
-	event.usersRegistered.push(userName);
-	event.numUserRegistered = event.numUserRegistered + 1;
-
 	//check if user can register for the event
 	let userEventsRegistered = user.eventsRegistered;
 
@@ -182,6 +179,8 @@ const registerForEvent = async (eventID, userName) => {
 	}
 
 	//update Event
+	event.usersRegistered.push(userName);
+	event.numUserRegistered = event.numUserRegistered + 1;
 	let updateParamter = {};
 	updateParamter.usersRegistered = event.usersRegistered;
 	updateParamter.numUserRegistered = event.numUserRegistered;
@@ -209,12 +208,11 @@ const deRegisterForEvent = async (eventID, userName) => {
 		throw `You Are not registered in the event`;
 	}
 
+	//update Event
 	event.usersRegistered = event.usersRegistered.filter(function (value) {
 		return value != userName;
 	});
 	event.numUserRegistered = event.numUserRegistered - 1;
-
-	//update Event
 	let updateParamter = {};
 	updateParamter.usersRegistered = event.usersRegistered;
 	updateParamter.numUserRegistered = event.numUserRegistered;
@@ -229,6 +227,37 @@ const deRegisterForEvent = async (eventID, userName) => {
 
 	let new_user = await users.updateUser(userName, updateParamter);
 	return event;
+};
+
+const deleteEvent = async (eventID) => {
+	//
+	helpers.errorIfNotProperID(eventID);
+	let event = await getEventData(eventID);
+
+	for (let i = 0; i < event.usersRegistered.length; i++) {
+		//update User
+		let userName = event.usersRegistered[i].toLowerCase().trim();
+		helpers.errorIfNotProperUserName(userName);
+		userName = userName.toLowerCase();
+		let user = await users.getUserData(userName);
+
+		user.eventsRegistered = user.eventsRegistered.filter(function (value) {
+			return value != event._id.toString();
+		});
+		updateParamter = {};
+		updateParamter.eventsRegistered = user.eventsRegistered;
+	}
+
+	const event_collection_c = await event_collection();
+	let deleteInfo = await event_collection_c.deleteOne({
+		_id: ObjectId(eventID),
+	});
+
+	if (deleteInfo.deletedCount === 0) {
+		throw 'Could not Delete event successfully';
+	}
+
+	return deleteInfo;
 };
 
 const updateEvent = async (eventID, updateParamter) => {
@@ -297,4 +326,5 @@ module.exports = {
 	registerForEvent,
 	updateEvent,
 	deRegisterForEvent,
+	deleteEvent,
 };

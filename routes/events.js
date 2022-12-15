@@ -236,6 +236,14 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 			});
 		}
 
+		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't register for your own event`,
+			});
+		}
+
 		capacityLeft = event.numUserRegistered >= event.capacity ? false : true;
 
 		if (!capacityLeft) {
@@ -292,6 +300,15 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 				message: 'Only logged in user can favorite a the events',
 			});
 		}
+
+		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't set your own event as favorite`,
+			});
+		}
+
 		let updateParamter = {};
 		if (userFav) {
 			//update User
@@ -338,6 +355,14 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 			});
 		}
 
+		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't de-register for your own event`,
+			});
+		}
+
 		if (!user.eventsRegistered.includes(eventID)) {
 			throw `You Are not registered in the event`;
 		}
@@ -345,6 +370,63 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 		await eventData.deRegisterForEvent(eventID, userName);
 
 		return res.redirect('/event/' + eventID);
+	} catch (e) {
+		//
+		event.userName = userName;
+		event.userPresent = userPresent;
+		event.capacityLeft = capacityLeft;
+		event.registerLink = `/event/register/${eventID}`;
+		event.eventFavLink = `/event/fav/${eventID}`;
+		event.error_message = e;
+		event.error = true;
+
+		event.eventList = [];
+		eventList.push(event);
+
+		res.render('eventPage', {
+			title: event.eventName,
+			eventList: eventList,
+			pageName: 'eventPage',
+		});
+	}
+});
+
+router.route('/event/delete/:eventId').get(async (req, res) => {
+	//
+	let eventID = req.params.eventId.trim();
+	let userPresent = false;
+	let user;
+	let event = {};
+	let userFav;
+	let userName;
+	let eventList = [];
+	let capacityLeft;
+	try {
+		event = await eventData.getEventData(eventID);
+		if (req.session.user) {
+			user = await userData.getUserData(req.session.user);
+			userPresent = true;
+			userFav = user.favoriteEvents.includes(eventID) ? true : false;
+			userName = user.username;
+		} else {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: 'Only logged in user can register in the events',
+			});
+		}
+
+		if (event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't delete someone else's event`,
+			});
+		}
+
+		await eventData.deleteEvent(eventID);
+
+		return res.redirect('/');
 	} catch (e) {
 		//
 		event.userName = userName;
