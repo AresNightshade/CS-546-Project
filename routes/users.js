@@ -11,7 +11,7 @@ router
 	.route('/login')
 	.get(async (req, res) => {
 		//code here for GET
-		//		req.session.user = 'farhan';
+		req.session.user = 'farhan';
 		if (req.session.user) {
 			return res.redirect('/');
 		} else {

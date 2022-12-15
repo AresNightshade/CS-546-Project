@@ -20,6 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
+const moment = require('moment');
+const Handlebars = require('handlebars');
+
+Handlebars.registerHelper('formatDate', function (date, format) {
+	return moment(date).format(format);
+});
+
 app.use(
 	session({
 		name: 'AuthCookie',

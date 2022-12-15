@@ -4,6 +4,7 @@ const user_collection = mongoCollections.user_collection;
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const { collegeList } = require('./const_data');
+const lodash = require('lodash');
 
 const createUser = async (username, password, firstName, lastName, college) => {
 	helpers.errorIfNotProperUserName(username, 'usernames');
@@ -100,4 +101,40 @@ const getUserData = async (username) => {
 	return user;
 };
 
-module.exports = { createUser, checkUser, getUserData };
+const updateUser = async (userName, updateParamter) => {
+	helpers.errorIfNotProperUserName(userName);
+	userName = userName.toLowerCase();
+	let old_user = await getUserData(userName);
+	let new_user = lodash.cloneDeep(old_user);
+
+	if (updateParamter.username) throw `Can't update username of the User`;
+	if (updateParamter.password) throw `Can't update password of the User`;
+
+	let anyUpdate = false;
+	for (const key in old_user) {
+		if (key in updateParamter) {
+			if (
+				typeof updateParamter[key] === typeof old_user[key] &&
+				!lodash.isEqual(updateParamter[key], old_user[key])
+			) {
+				anyUpdate = true;
+				new_user[key] = updateParamter[key];
+			}
+		}
+	}
+	if (!anyUpdate) throw 'No user parameter updated';
+
+	const user_collection_c = await user_collection();
+	const updatedInfo = await user_collection_c.updateOne(
+		{ username: userName },
+		{ $set: new_user }
+	);
+
+	if (updatedInfo.modifiedCount === 0) {
+		throw 'Could not update user successfully';
+	}
+
+	new_user = await getUserData(userName);
+	return new_user;
+};
+module.exports = { createUser, checkUser, getUserData, updateUser };
