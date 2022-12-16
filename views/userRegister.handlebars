@@ -3,7 +3,7 @@
     {{#if error}}
         <p>{{error_message}}</p>
     {{/if}}
-    <br/>
+    <br>
     <div>
         <form action="/user/register" method="POST" id="registration-form">
                 <label for="usernameInput">Username:</label>
@@ -18,8 +18,7 @@
                 <label for="lastNameInput">Last Name:</label>
                 <input type="Text" name="lastNameInput" id="lastNameInput" value="{{lastName}}">
                 <br>
-                <label for="College">Choose Your College:</label>
-
+                <label for="collegeNameInput">Choose Your College:</label>
                 <select name="collegeNameInput" id="collegeNameInput">
                 <option value="">--Please choose your College--</option>
                 {{#each collegeList}}

@@ -74,10 +74,10 @@
 
   {{#if userPresent}}
     <h5>Leave a Comment</h5>
-      <form methd="POST"  onsubmit="return doComment(this);" id="new-comment-form">
-        <input type="hidden" name="postCommentLink" value={{postCommentLink}} />
+      <form method="POST"  onsubmit="return doComment(this);" id="new-comment-form">
+        <input type="hidden" name="postCommentLink" value={{postCommentLink}} >
         <div class="form-group">
-          <textarea class "form-control" name="comment" rows="2"></textarea>
+          <textarea class="form-control" name="comment" rows="2"></textarea>
         </div>
         <button type="submit" class="btn-primary">Post Comment</button>
       </form>
