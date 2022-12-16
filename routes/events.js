@@ -5,34 +5,126 @@ const helpers = require('../helpers');
 const data = require('../data');
 const eventData = data.events;
 const userData = data.users;
+const commentData = data.comments;
 const { collegeList } = data;
 const { localDateTime } = data;
 const { ObjectId } = require('mongodb');
+const multer = require('multer');
+const sharp = require('sharp');
+const port = process.env.PORT || 5000;
+const fs = require('fs');
+const { Console } = require('console');
 
-router.route('/').get(async (req, res) => {
-	//code here for GET
-	let filter = { endTime: { $gt: new Date() } };
-	let userPresent = false;
-	let userName;
-	let eventList = [];
-	if (req.session.user) {
-		let user = await userData.getUserData(req.session.user);
-		filter.college = user.college;
-		eventList = await eventData.findAllEvent(filter);
-		userPresent = true;
-		userName = req.session.user;
-	} else {
-		eventList = await eventData.findAllEvent(filter);
-	}
-	eventList.map((x) => (x.eventLink = '/event/' + x._id));
-	res.render('homePage', {
-		title: 'RSVP',
-		eventList: eventList,
-		pageName: 'homePage',
-		userPresent: userPresent,
-		userName: userName,
-	});
+const upload = multer({
+	limits: {
+		fileSize: 5000000,
+	},
+	fieldName: 'image',
+	fileFilter(req, file, cb) {
+		if (!file.originalname.toLocaleLowerCase().match(/\.(jpg|jpeg|png)$/)) {
+			return cb(new Error('Please upload a valid image file'));
+		}
+		cb(undefined, true);
+	},
 });
+
+router
+	.route('/')
+	.get(async (req, res) => {
+		//code here for GET
+		let filter = { endTime: { $gt: new Date() } };
+		let userPresent = false;
+		let userName;
+		let eventList = [];
+		if (req.session.user) {
+			let user = await userData.getUserData(req.session.user);
+			filter.college = user.college;
+			eventList = await eventData.findAllEvent(filter);
+			userPresent = true;
+			userName = req.session.user;
+		} else {
+			eventList = await eventData.findAllEvent(filter);
+		}
+		eventList.map((x) => (x.eventLink = '/event/' + x._id));
+		res.render('homePage', {
+			title: 'RSVP',
+			eventList: eventList,
+			pageName: 'homePage',
+			userPresent: userPresent,
+			userName: userName,
+		});
+	})
+	.post(async (req, res) => {
+		try {
+			let filter = { endTime: { $gt: new Date() } };
+			let userPresent = false;
+			let userName;
+			let eventFilter;
+			let newPageName;
+			let eventList = [];
+			let searchElement = req.body.searchElement;
+			searchElement = searchElement.toLocaleLowerCase().trim();
+			//helpers.errorIfNotProperString(searchElement, 'Search Element');
+
+			filter['$or'] = [
+				{ description: { $regex: searchElement, $options: 'i' } },
+				{ tags: { $regex: searchElement, $options: 'i' } },
+				{ eventName: { $regex: searchElement, $options: 'i' } },
+			];
+			if (req.session.user) {
+				let user = await userData.getUserData(req.session.user);
+				filter.college = user.college;
+				userPresent = true;
+				userName = req.session.user.trim().toLowerCase();
+				eventFilter = req.body.eventFilter.toLowerCase().trim();
+				if (eventFilter === 'created') {
+					newPageName = 'Created Events';
+					filter['postedBy'] = userName;
+				}
+				if (eventFilter === 'registered') {
+					newPageName = 'Registered Events';
+					let registered_list = user.eventsRegistered;
+					registered_list = registered_list.map(function (val) {
+						val = ObjectId(val);
+						return val;
+					});
+					filter['_id'] = { $in: registered_list };
+				}
+
+				if (eventFilter === 'fav') {
+					newPageName = 'Favorite Events';
+					let fav_list = user.favoriteEvents;
+					fav_list = fav_list.map(function (val) {
+						val = ObjectId(val);
+						return val;
+					});
+					filter['_id'] = { $in: fav_list };
+				}
+			}
+			console.log(eventFilter);
+			eventList = await eventData.findAllEvent(filter);
+
+			eventList.map((x) => (x.eventLink = '/event/' + x._id));
+			res.render('homePage', {
+				title: 'RSVP',
+				eventList: eventList,
+				newPageName: newPageName,
+				pageName: 'homePage',
+				userPresent: userPresent,
+				userName: userName,
+			});
+		} catch (e) {
+			res.render('homePage', {
+				title: 'RSVP',
+				eventList: eventList,
+				pageName: 'homePage',
+				userPresent: userPresent,
+				userName: userName,
+				error: true,
+				error_message: e,
+			});
+		}
+	});
 
 router
 	.route('/event/createEvent')
@@ -62,7 +154,7 @@ router
 			});
 		}
 	})
-	.post(async (req, res) => {
+	.post(upload.single('image'), async (req, res) => {
 		//
 		try {
 			if (req.session.user) {
@@ -73,7 +165,7 @@ router
 				let tags = req.body.tagsInput;
 				let description = req.body.descriptionInput;
 				let capacity = req.body.capacityInput;
-				let image = req.body.image;
+				let image = false;
 
 				try {
 					helpers.errorIfNotProperString(eventName, 'eventName');
@@ -81,6 +173,16 @@ router
 					helpers.errorIfNotProperDateTime(startTime);
 					helpers.errorIfNotProperDateTime(endTime);
 
+					if (req.file) {
+						await sharp(req.file.buffer)
+							.resize({ width: 250, height: 250 })
+							.png()
+							.toFile(__dirname + `/../public/uploads/image/temp_file`);
+						fs.unlinkSync(__dirname + `./../public/uploads/image/temp_file`);
+						image = req.file.originalname;
+					} else {
+						image = false;
+					}
 					const now = localDateTime;
 					const minDateTime = new Date(now.getTime() + 30 * 60000);
 					const maxDateEndTime = new Date(
@@ -134,6 +236,17 @@ router
 					capacity,
 					image
 				);
+				if (req.file) {
+					await sharp(req.file.buffer)
+						.resize({ width: 250, height: 250 })
+						.png()
+						.toFile(
+							__dirname +
+								`/../public/uploads/image/${
+									event._id.toString() + '_' + req.file.originalname
+								}`
+						);
+				}
 				return res.redirect('/');
 			} else {
 				res.render('error', {
@@ -143,6 +256,7 @@ router
 				});
 			}
 		} catch (e) {
+			console.log(e);
 			res.render('createEvent', {
 				title: 'Create Event',
 				pageName: 'createEvent',
@@ -154,7 +268,7 @@ router
 
 router.route('/event/:eventId').get(async (req, res) => {
 	//
-	let eventID = req.params.eventId.trim();
+	let eventId = req.params.eventId.trim();
 	let userPresent = false;
 	let user;
 	let event;
@@ -167,12 +281,12 @@ router.route('/event/:eventId').get(async (req, res) => {
 		if (req.session.user) {
 			user = await userData.getUserData(req.session.user);
 			userPresent = true;
-			userFav = user.favoriteEvents.includes(eventID) ? true : false;
-			userRegistered = user.eventsRegistered.includes(eventID) ? true : false;
+			userFav = user.favoriteEvents.includes(eventId) ? true : false;
+			userRegistered = user.eventsRegistered.includes(eventId) ? true : false;
 			userName = user.username;
 		}
 
-		event = await eventData.getEventData(eventID);
+		event = await eventData.getEventData(eventId);
 
 		if (req.session.user) {
 			if (event.postedBy.toLowerCase() === userName.toLowerCase()) {
@@ -183,6 +297,9 @@ router.route('/event/:eventId').get(async (req, res) => {
 
 		let capacityLeft = event.numUserRegistered >= event.capacity ? false : true;
 
+		if (event.image) {
+			event.imagePath = `/public/uploads/image/${eventId + '_' + event.image}`;
+		}
 		event.userPresent = userPresent;
 		event.notOwnerTag = notOwnerTag;
 		event.userName = userName;
@@ -190,11 +307,12 @@ router.route('/event/:eventId').get(async (req, res) => {
 		event.userFav = userFav;
 		event.userRegistered = userRegistered;
 		event.capacityLeft = capacityLeft;
-		event.registerLink = `/event/register/${eventID}`;
-		event.deRegisterLink = `/event/deregister/${eventID}`;
-		event.eventFavLink = `/event/fav/${eventID}`;
-		event.editEvent = `/event/edit/${eventID}`;
-		event.deleteEvent = `/event/delete/${eventID}`;
+		event.registerLink = `/event/register/${eventId}`;
+		event.deRegisterLink = `/event/deregister/${eventId}`;
+		event.eventFavLink = `/event/fav/${eventId}`;
+		event.editEvent = `/event/edit/${eventId}`;
+		event.deleteEvent = `/event/delete/${eventId}`;
+		event.postCommentLink = `/event/postComment/${eventId}`;
 
 		let eventList = [];
 		eventList.push(event);
@@ -213,7 +331,7 @@ router.route('/event/:eventId').get(async (req, res) => {
 
 router.route('/event/register/:eventId').get(async (req, res) => {
 	//
-	let eventID = req.params.eventId.trim();
+	let eventId = req.params.eventId.trim();
 	let userPresent = false;
 	let user;
 	let event = {};
@@ -222,11 +340,11 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 	let eventList = [];
 	let capacityLeft;
 	try {
-		event = await eventData.getEventData(eventID);
+		event = await eventData.getEventData(eventId);
 		if (req.session.user) {
 			user = await userData.getUserData(req.session.user);
 			userPresent = true;
-			userFav = user.favoriteEvents.includes(eventID) ? true : false;
+			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
 			return res.render('error', {
@@ -244,6 +362,16 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 			});
 		}
 
+		if (
+			event.college.toLowerCase().trim() !== user.college.toLowerCase().trim()
+		) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't register for different college event`,
+			});
+		}
+
 		capacityLeft = event.numUserRegistered >= event.capacity ? false : true;
 
 		if (!capacityLeft) {
@@ -253,16 +381,16 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 				message: 'Sorry! but the event is at full capacity',
 			});
 		}
-		await eventData.registerForEvent(eventID, userName);
+		await eventData.registerForEvent(eventId, userName);
 
-		return res.redirect('/event/' + eventID);
+		return res.redirect('/event/' + eventId);
 	} catch (e) {
 		//
 		event.userName = userName;
 		event.userPresent = userPresent;
 		event.capacityLeft = capacityLeft;
-		event.registerLink = `/event/register/${eventID}`;
-		event.eventFavLink = `/event/fav/${eventID}`;
+		event.registerLink = `/event/register/${eventId}`;
+		event.eventFavLink = `/event/fav/${eventId}`;
 		event.error_message = e;
 		event.error = true;
 
@@ -279,7 +407,7 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 
 router.route('/event/fav/:eventId').get(async (req, res) => {
 	//
-	let eventID = req.params.eventId.trim();
+	let eventId = req.params.eventId.trim();
 	let userPresent = false;
 	let user;
 	let event = {};
@@ -287,11 +415,11 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 	let userName;
 
 	try {
-		event = await eventData.getEventData(eventID);
+		event = await eventData.getEventData(eventId);
 		if (req.session.user) {
 			user = await userData.getUserData(req.session.user);
 			userPresent = true;
-			userFav = user.favoriteEvents.includes(eventID) ? true : false;
+			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
 			return res.render('error', {
@@ -309,6 +437,16 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 			});
 		}
 
+		if (
+			event.college.toLowerCase().trim() !== user.college.toLowerCase().trim()
+		) {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: `You can't fav  different college event`,
+			});
+		}
+
 		let updateParamter = {};
 		if (userFav) {
 			//update User
@@ -322,17 +460,17 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 		updateParamter.favoriteEvents = user.favoriteEvents;
 		await userData.updateUser(userName, updateParamter);
 
-		return res.redirect('/event/' + eventID);
+		return res.redirect('/event/' + eventId);
 	} catch (e) {
 		//
 		console.log(e);
-		return res.redirect('/event/' + eventID);
+		return res.redirect('/event/' + eventId);
 	}
 });
 
 router.route('/event/deregister/:eventId').get(async (req, res) => {
 	//
-	let eventID = req.params.eventId.trim();
+	let eventId = req.params.eventId.trim();
 	let userPresent = false;
 	let user;
 	let event = {};
@@ -341,11 +479,11 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 	let eventList = [];
 	let capacityLeft;
 	try {
-		event = await eventData.getEventData(eventID);
+		event = await eventData.getEventData(eventId);
 		if (req.session.user) {
 			user = await userData.getUserData(req.session.user);
 			userPresent = true;
-			userFav = user.favoriteEvents.includes(eventID) ? true : false;
+			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
 			return res.render('error', {
@@ -363,20 +501,20 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 			});
 		}
 
-		if (!user.eventsRegistered.includes(eventID)) {
+		if (!user.eventsRegistered.includes(eventId)) {
 			throw `You Are not registered in the event`;
 		}
 
-		await eventData.deRegisterForEvent(eventID, userName);
+		await eventData.deRegisterForEvent(eventId, userName);
 
-		return res.redirect('/event/' + eventID);
+		return res.redirect('/event/' + eventId);
 	} catch (e) {
 		//
 		event.userName = userName;
 		event.userPresent = userPresent;
 		event.capacityLeft = capacityLeft;
-		event.registerLink = `/event/register/${eventID}`;
-		event.eventFavLink = `/event/fav/${eventID}`;
+		event.registerLink = `/event/register/${eventId}`;
+		event.eventFavLink = `/event/fav/${eventId}`;
 		event.error_message = e;
 		event.error = true;
 
@@ -393,7 +531,7 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 
 router.route('/event/delete/:eventId').get(async (req, res) => {
 	//
-	let eventID = req.params.eventId.trim();
+	let eventId = req.params.eventId.trim();
 	let userPresent = false;
 	let user;
 	let event = {};
@@ -402,17 +540,17 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 	let eventList = [];
 	let capacityLeft;
 	try {
-		event = await eventData.getEventData(eventID);
+		event = await eventData.getEventData(eventId);
 		if (req.session.user) {
 			user = await userData.getUserData(req.session.user);
 			userPresent = true;
-			userFav = user.favoriteEvents.includes(eventID) ? true : false;
+			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
 			return res.render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
-				message: 'Only logged in user can register in the events',
+				message: 'Only logged in user can delete a event',
 			});
 		}
 
@@ -424,7 +562,7 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 			});
 		}
 
-		await eventData.deleteEvent(eventID);
+		await eventData.deleteEvent(eventId);
 
 		return res.redirect('/');
 	} catch (e) {
@@ -432,8 +570,8 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 		event.userName = userName;
 		event.userPresent = userPresent;
 		event.capacityLeft = capacityLeft;
-		event.registerLink = `/event/register/${eventID}`;
-		event.eventFavLink = `/event/fav/${eventID}`;
+		event.registerLink = `/event/register/${eventId}`;
+		event.eventFavLink = `/event/fav/${eventId}`;
 		event.error_message = e;
 		event.error = true;
 
@@ -447,4 +585,171 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 		});
 	}
 });
+
+router
+	.route('/event/edit/:eventId')
+	.get(async (req, res) => {
+		//code here for GET
+		let eventId = req.params.eventId.trim();
+		let user;
+		let event = {};
+		let minCapacity;
+		let userName;
+		try {
+			event = await eventData.getEventData(eventId);
+			minCapacity = Math.max(event.numUserRegistered, 1);
+			if (req.session.user) {
+				user = await userData.getUserData(req.session.user);
+				userName = user.username;
+			} else {
+				return res.render('error', {
+					title: 'Not Authorized',
+					head: 'Not Authorized',
+					message: 'Only logged in user can edit a event',
+				});
+			}
+
+			if (
+				event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()
+			) {
+				return res.render('error', {
+					title: 'Not Authorized',
+					head: 'Not Authorized',
+					message: `You can't edit someone else's event`,
+				});
+			}
+			res.render('editEvent', {
+				title: 'Edit Event',
+				pageName: 'editEvent',
+				postLink: `/event/edit/${eventId}`,
+				minCapacity: minCapacity,
+			});
+		} catch (e) {
+			//
+			return res.render('error', {
+				title: 'Error',
+				head: `Error`,
+				message: e,
+			});
+		}
+	})
+	.post(upload.single('image'), async (req, res) => {
+		//
+		let eventId = req.params.eventId.trim();
+		let minCapacity;
+		let event;
+		let user;
+		try {
+			if (req.session.user) {
+				event = await eventData.getEventData(eventId);
+				user = await userData.getUserData(req.session.user);
+				let userName = user.username;
+				if (
+					event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()
+				) {
+					return res.render('error', {
+						title: 'Not Authorized',
+						head: 'Not Authorized',
+						message: `You can't edit someone else's event`,
+					});
+				}
+
+				minCapacity = Math.max(event.numUserRegistered, 1);
+				let eventName = req.body.eventNameInput;
+				let location = req.body.locationInput;
+				let tags = req.body.tagsInput;
+				let description = req.body.descriptionInput;
+				let capacity = req.body.capacityInput;
+				let image = req.body.image;
+				let updateParamter = {};
+
+				if (req.file) {
+					await sharp(req.file.buffer)
+						.resize({ width: 250, height: 250 })
+						.png()
+						.toFile(
+							__dirname +
+								`/../public/uploads/image/${
+									event._id.toString() + '_' + req.file.originalname
+								}`
+						);
+
+					updateParamter.image = req.file.originalname;
+				}
+
+				if (eventName) {
+					helpers.errorIfNotProperString(eventName, 'eventName');
+					updateParamter.eventName = eventName;
+				}
+
+				if (description) {
+					helpers.errorIfNotProperString(description, 'description');
+					updateParamter.description = description;
+				}
+				if (tags) {
+					helpers.errorIfNotProperString(tags, 'tags');
+					updateParamter.tags = tags;
+				}
+				if (location) {
+					helpers.errorIfNotProperString(location, 'location');
+					updateParamter.location = location;
+				}
+				if (capacity) {
+					helpers.errorIfStringIsNotNumber(capacity);
+					capacity = parseFloat(capacity);
+					if (capacity < Math.max(minCapacity, 1) || capacity % 1 > 0) {
+						throw `Invalid Capacity provided`;
+					}
+					updateParamter.capacity = capacity;
+				}
+
+				event = await eventData.updateEvent(eventId, updateParamter);
+				return res.redirect('/event/' + eventId);
+			} else {
+				res.render('error', {
+					title: 'Not Authorized',
+					head: 'Not Authorized',
+					message: 'Only logged in user can edit the events',
+				});
+			}
+		} catch (e) {
+			console.log(e);
+			res.render('editEvent', {
+				title: 'Edit Event',
+				pageName: 'editEvent',
+				minCapacity: minCapacity,
+				postLink: `/event/edit/${eventId}`,
+				error: true,
+				error_message: e,
+			});
+		}
+	});
+
+router.route('/event/postComment/:eventId').post(async (req, res) => {
+	//
+	try {
+		let eventId = req.params.eventId.trim();
+		let commentBody = req.body.comment;
+		helpers.errorIfNotProperString(commentBody);
+		let event = await eventData.getEventData(eventId);
+		let userName;
+		if (req.session.user) {
+			user = await userData.getUserData(req.session.user);
+			userName = user.username;
+		} else {
+			return res.render('error', {
+				title: 'Not Authorized',
+				head: 'Not Authorized',
+				message: 'Only logged in user can comment on a event',
+			});
+		}
+		comment = commentData.createComment(eventId, userName, commentBody);
+		console.log('here');
+		return res.send(comment);
+	} catch (e) {
+		//
+		return res.send(e);
+	}
+});
+
 module.exports = router;

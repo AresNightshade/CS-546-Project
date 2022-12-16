@@ -8,9 +8,28 @@
 {{else}}
   <p>Please <a href="/user/login">Log In</a> or <a href="/user/register">Register</a></p>
 {{/if}}
+<br>
+ <a href="/">Home Page</a>
 
+
+<form action="/" method="POST" id="Event-Search">
+  <label for="searchElement">Search:</label>
+  <input type="text" name="searchElement" id="searchElement">
+  {{#if userPresent}}
+    <select name="eventFilter" id="eventFilter">
+    <option value="all">All the Event</option>
+    <option value="fav">Favorite Events</option>
+    <option value="registered">Registered Event</option>
+    <option value="created">Created Events</option>
+  {{/if}}
+  <input type="submit" value="Search" id="Search">
+</form>
+
+{{#if newPageName}}
+<h2>{{newPageName}}</h2>
+{{else}}
 <h2>Upcoming Events</h2>
-
+{{/if}}
 {{#if eventList}}
   <ul>
     {{#each eventList}}

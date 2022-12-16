@@ -14,7 +14,8 @@ const createEvent = async (
 	postedBy,
 	tags,
 	description,
-	capacity
+	capacity,
+	image
 ) => {
 	//
 	const event_collection_c = await event_collection();
@@ -59,7 +60,7 @@ const createEvent = async (
 		capacity: capacity,
 		numUserRegistered: 0,
 		usersRegistered: [],
-		images: [],
+		image: image,
 		college: college,
 		comments: [],
 	};
@@ -287,7 +288,7 @@ const updateEvent = async (eventID, updateParamter) => {
 	for (const key in old_event) {
 		if (key in updateParamter) {
 			if (
-				typeof updateParamter[key] === typeof old_event[key] &&
+				//typeof updateParamter[key] === typeof old_event[key] &&
 				!lodash.isEqual(updateParamter[key], old_event[key])
 			) {
 				anyUpdate = true;
@@ -295,7 +296,9 @@ const updateEvent = async (eventID, updateParamter) => {
 			}
 		}
 	}
-	if (!anyUpdate) throw 'No Event parameter updated';
+	if (!('image' in updateParamter) && !anyUpdate) {
+		throw 'No Event parameter updated';
+	}
 
 	helpers.errorIfNotProperString(new_event.eventName, 'eventName');
 	helpers.errorIfNotProperString(new_event.location, 'location');
@@ -311,8 +314,10 @@ const updateEvent = async (eventID, updateParamter) => {
 		{ $set: new_event }
 	);
 
-	if (updatedInfo.modifiedCount === 0) {
-		throw 'Could not Update event successfully';
+	if (!('image' in updateParamter)) {
+		if (updatedInfo.modifiedCount === 0) {
+			throw 'Could not Update event successfully';
+		}
 	}
 
 	new_event = await getEventData(eventID);

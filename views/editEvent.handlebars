@@ -1,24 +1,18 @@
 
 
-        <h1>Create Event</h1>
+        <h1>Edit Event</h1>
     {{#if error}}
         <p>{{error_message}}</p>
     {{/if}}
      <a href="/">Home Page</a>    
     <br/>
     <div>
-        <form action="/event/createEvent" method="POST" id="createEvent-form" enctype='multipart/form-data'>
+        <form action={{postLink}} method="POST" id="editEvent-form" enctype='multipart/form-data'>
                 <label for="eventNameInput">Event Name:</label>
                 <input type="text" name="eventNameInput" id="eventNameInput">
                 <br>
                 <label for="locationInput">Location:</label>
                 <input type="text" name="locationInput" id="locationInput">
-                <br>
-                <label for="startTimeInput">Start Time:</label>
-                <input type="datetime-local" name="startTimeInput" id="startTimeInput" min ={{minDateStartTimeString}}>
-                <br>
-                <label for="endTimeInput">End Time:</label>
-                <input type="datetime-local" name="endTimeInput" id="endTimeInput" min ={{minDateStartTimeString}} max ={{maxDateEndTimeString}}>
                 <br>
                 <label for="tagsInput">Comma Seperated Tags:</label>
                 <input type="text" name="tagsInput" id="tagsInput">
@@ -27,15 +21,14 @@
                 <input type="text" name="descriptionInput" id="descriptionInput">
                 <br>
                 <label for="capacityInput">Capacity:</label>
-                <input type="number" name="capacityInput" id="capacityInput" min="1" step="1">
+                <input type="number" name="capacityInput" id="capacityInput" min={{minCapacity}} step="1">
                 <br>
                 <br>
-
                 <label for="image">Select an image to upload for the event:</label>
                 <input type="file" id="image" name="image" accept="image/*"><br>
 
-                <input type="submit" value="createEvent" id="createEvent">
+                <input type="submit" value="editEvent" id="createEvent">
         </form>
     </div>
 
-<script src="/public/js/createEvent.js"></script>
+<script src="/public/js/editEvent.js"></script>

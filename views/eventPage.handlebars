@@ -12,10 +12,13 @@
   {{/if}}
 
 
-
   <article>
     <h2>{{eventName}}</h2>
     <p>
+      {{#if imagePath}}
+      <img src="{{imagePath}}">
+      <br>
+      {{/if}}
       Start Time: {{formatDate startTime "YYYY-MM-DD hh:mm"}}<br>
       End Time: {{formatDate endTime "YYYY-MM-DD hh:mm"}}<br>
       Description: {{description}}<br>
@@ -24,13 +27,27 @@
     </p>
   </article>
   
-  {{#each comments}}
-    <h6>{{userName}}</h6> commented on {{commentDate}}
+  {{#if userPresent}}
+  <h5>Leave a Comment</h5>
+    <form methd="POST"  onsubmit="return doComment(this);" id="new-comment-form">
+      <input type="hidden" name="postCommentLink" value={{postCommentLink}} />
+      <div class="form-group">
+        <textarea class "form-control" name="comment" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">Post Comment</button>
+    </form>
     <br>
-    <article>
-      {{body}}
-    </article>
-  {{/each}}
+  {{/if}}
+
+    <ul id="commentList">    
+    {{#each comments}}
+    <li><article>
+      <h3>{{userName}} commented on {{ formatDate commentDate "YYYY-MM-DD"}}</h3>
+      <br>
+        {{body}}
+      </article></li>
+    {{/each}}
+    </ul>
 
   {{#if notOwnerTag}}
     {{#if userPresent}}
@@ -76,3 +93,10 @@
     {{/if}}
   {{/if}}
 {{/each}}
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.6/handlebars.min.js"></script>
+<script src="/public/js/eventPage.js"></script>
