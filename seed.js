@@ -82,7 +82,7 @@ async function main() {
 		u1.username.toLowerCase(),
 		'Fun, Relax',
 		`Please come by to the 2nd floor of the UCC South Tower for an end of semester Tea Party!. We will have tea and knitting/crochet supplies available, come by with your Work in Progress to relax and de-stress. A crochet prize, light snacks, free knitting and crochet supplies and free spider plants (subject to availability!).`,
-		100
+		2
 	);
 
 	let e2 = await eventData.createEvent(
@@ -93,7 +93,7 @@ async function main() {
 		u1.username.toLowerCase(),
 		'Health, Exercise',
 		`Join the Stevens Running Club for our weekly group run! Runners of any experience are welcome. We break into a number of groups, usually with one longer distance run (4 miles) and then a slower, shorter distance group (1-2 miles). Join whichever group you feel most comfortable with. We'd love to run with you!`,
-		50
+		1
 	);
 
 	let e3 = await eventData.createEvent(
@@ -155,7 +155,8 @@ async function main() {
 
 	await eventData.registerForEvent(e1._id.toString(), u2.username);
 	await eventData.registerForEvent(e1._id.toString(), u3.username);
-	await eventData.registerForEvent(e1._id.toString(), u4.username);
+
+	await eventData.registerForEvent(e2._id.toString(), u4.username);
 
 	await commentData.createComment(e1._id.toString(), u1.username, 'Lets Party');
 	await commentData.createComment(
