@@ -1,7 +1,9 @@
 # CS-546-Group-Project
 Getting Started
 Install the node modules by running "npm i"
+
 Seed the database by running "npm run seed"
+
 Start the server by running "npm start"
 
 Notes
