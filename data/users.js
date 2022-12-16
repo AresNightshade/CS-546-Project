@@ -49,11 +49,12 @@ const createUser = async (username, password, firstName, lastName, college) => {
 	};
 
 	const insertInfo = await user_collection_c.insertOne(new_user);
+	let user = getUserData(username);
 
 	if (insertInfo.insertedCount === 0) {
 		throw `Server Error`;
 	} else {
-		return { userInserted: true };
+		return user;
 	}
 };
 

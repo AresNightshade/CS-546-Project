@@ -20,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
+app.use('/image', express.static('public/uploads/image'));
+
 const moment = require('moment');
 const Handlebars = require('handlebars');
 

@@ -1,38 +1,96 @@
 body {
   font-family: sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
+}
+
+main {
+  width: 80%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+p {
+  margin: 10px 0;
+}
+
+article {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+h2 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+form {
+  margin: 20px 0;
+  text-align: left;
+}
+
+textarea {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button[type="submit"] {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #0077ff;
+  color: white;
+  font-weight: bold;
+}
+
+button[type="submit"]:hover {
+  cursor: pointer;
+  background-color: #004cbf;
 }
 
 a {
   text-decoration: none;
-  color: blue;
+  color: #0077ff;
+  font-weight: bold;
 }
 
 a:hover {
   text-decoration: underline;
+  cursor: pointer;
+}
+
+
+/* Set basic styles for the page */
+body {
+  font-family: sans-serif;
+  color: #333;
+  line-height: 1.5;
+  background-color: #f8f8f8;
 }
 
 main {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 15px;
 }
 
-article {
-  background-color: white;
-  margin-bottom: 20px;
-  padding: 20px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+/* Style the welcome message */
+p {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
-article h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 18px;
+/* Style the event title */
+h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
-article p {
-  margin: 0;
-  font-size: 14px;
+/* Style the comment form */
+h5 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
+

@@ -8,7 +8,7 @@ const constructorMethod = (app) => {
 	app.use('/', event);
 
 	app.use('*', (req, res) => {
-		res.sendStatus(404);
+		return res.redirect('/');
 	});
 };
 
