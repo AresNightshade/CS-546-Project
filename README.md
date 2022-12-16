@@ -1,10 +1,9 @@
 # CS-546-Group-Project
-run the following commands
-npm i    //for installing the node modules
-npm run seed    //for seed the database
-npm start   //for starting the server
+Getting Started
+Install the node modules by running "npm i"
+Seed the database by running "npm run seed"
+Start the server by running "npm start"
 
-I was not able to upload the photos in the seed file for the events because the photos are stores in eventId_orignalName format and once I create the event.
-But if the user is creating an event or editing an event, user can upload the photo during both time, just the seed file don't have the photos
-
-Current application is only valid for 3 colleges and if extra need to be added, the array in the cont_data needs to be updated
+Notes
+The seed file does not include photos for events. These can be uploaded by the user when creating or editing an event.
+The application is currently only valid for 3 colleges. If additional colleges need to be added, update the array in the cont_data file.
