@@ -7,7 +7,13 @@ function doComment(form) {
 		data: { comment: form.comment.value.trim() },
 		success: function (response) {
 			let comment = response;
-			alert('Comment Posted Successfully');
+			$('#commentList').prepend(
+				`<li><article>
+				<h3>${comment.userName} commented on  ${comment.commentDate} </h3>
+				<br>
+				  ${comment.body}
+				</article></li>`
+			);
 		},
 	});
 

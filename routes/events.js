@@ -99,7 +99,7 @@ router
 					filter['_id'] = { $in: fav_list };
 				}
 			}
-			console.log(eventFilter);
+
 			eventList = await eventData.findAllEvent(filter);
 
 			eventList.map((x) => (x.eventLink = '/event/' + x._id));
@@ -254,7 +254,6 @@ router
 				});
 			}
 		} catch (e) {
-			console.log(e);
 			res.render('createEvent', {
 				title: 'Create Event',
 				pageName: 'createEvent',
@@ -452,7 +451,7 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 		return res.redirect('/event/' + eventId);
 	} catch (e) {
 		//
-		console.log(e);
+
 		return res.redirect('/event/' + eventId);
 	}
 });
@@ -702,7 +701,6 @@ router
 				});
 			}
 		} catch (e) {
-			console.log(e);
 			res.render('editEvent', {
 				title: 'Edit Event',
 				pageName: 'editEvent',
@@ -732,8 +730,10 @@ router.route('/event/postComment/:eventId').post(async (req, res) => {
 				message: 'Only logged in user can comment on a event',
 			});
 		}
-		comment = commentData.createComment(eventId, userName, commentBody);
-		console.log('here');
+		comment = await commentData.createComment(eventId, userName, commentBody);
+		comment.success = true;
+		comment.commentDate = comment.commentDate.toISOString().split('T')[0];
+
 		return res.send(comment);
 	} catch (e) {
 		//
