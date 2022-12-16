@@ -26,28 +26,6 @@
       Posted By: {{postedBy}}<br>
     </p>
   </article>
-  
-  {{#if userPresent}}
-  <h5>Leave a Comment</h5>
-    <form methd="POST"  onsubmit="return doComment(this);" id="new-comment-form">
-      <input type="hidden" name="postCommentLink" value={{postCommentLink}} />
-      <div class="form-group">
-        <textarea class "form-control" name="comment" rows="2"></textarea>
-      </div>
-      <button type="submit" class="btn-primary">Post Comment</button>
-    </form>
-    <br>
-  {{/if}}
-
-    <ul id="commentList">    
-    {{#each comments}}
-    <li><article>
-      <h3>{{userName}} commented on {{ formatDate commentDate "YYYY-MM-DD"}}</h3>
-      <br>
-        {{body}}
-      </article></li>
-    {{/each}}
-    </ul>
 
   {{#if notOwnerTag}}
     {{#if userPresent}}
@@ -92,6 +70,31 @@
       <p>No One has registered for the event yet!.</p>
     {{/if}}
   {{/if}}
+
+
+  {{#if userPresent}}
+    <h5>Leave a Comment</h5>
+      <form methd="POST"  onsubmit="return doComment(this);" id="new-comment-form">
+        <input type="hidden" name="postCommentLink" value={{postCommentLink}} />
+        <div class="form-group">
+          <textarea class "form-control" name="comment" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Post Comment</button>
+      </form>
+      <br>
+    {{/if}}
+    
+    <ul id="commentList">    
+    {{#each comments}}
+    <li><article>
+      <h3>{{userName}} commented on {{ formatDate commentDate "YYYY-MM-DD"}}</h3>
+      <br>
+        {{body}}
+      </article></li>
+    {{/each}}
+    </ul>
+
+  
 {{/each}}
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="

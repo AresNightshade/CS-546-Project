@@ -6,14 +6,12 @@ const data = require('../data');
 const eventData = data.events;
 const userData = data.users;
 const commentData = data.comments;
-const { collegeList } = data;
 const { localDateTime } = data;
 const { ObjectId } = require('mongodb');
 const multer = require('multer');
 const sharp = require('sharp');
-const port = process.env.PORT || 5000;
 const fs = require('fs');
-const { Console } = require('console');
+const xss = require('xss');
 
 const upload = multer({
 	limits: {
@@ -62,7 +60,7 @@ router
 			let eventFilter;
 			let newPageName;
 			let eventList = [];
-			let searchElement = req.body.searchElement;
+			let searchElement = xss(req.body.searchElement);
 			searchElement = searchElement.toLocaleLowerCase().trim();
 			//helpers.errorIfNotProperString(searchElement, 'Search Element');
 
@@ -76,7 +74,7 @@ router
 				filter.college = user.college;
 				userPresent = true;
 				userName = req.session.user.trim().toLowerCase();
-				eventFilter = req.body.eventFilter.toLowerCase().trim();
+				eventFilter = xss(req.body.eventFilter.toLowerCase().trim());
 				if (eventFilter === 'created') {
 					newPageName = 'Created Events';
 					filter['postedBy'] = userName;
@@ -158,13 +156,13 @@ router
 		//
 		try {
 			if (req.session.user) {
-				let eventName = req.body.eventNameInput;
-				let location = req.body.locationInput;
-				let startTime = req.body.startTimeInput;
-				let endTime = req.body.endTimeInput;
-				let tags = req.body.tagsInput;
-				let description = req.body.descriptionInput;
-				let capacity = req.body.capacityInput;
+				let eventName = xss(req.body.eventNameInput);
+				let location = xss(req.body.locationInput);
+				let startTime = xss(req.body.startTimeInput);
+				let endTime = xss(req.body.endTimeInput);
+				let tags = xss(req.body.tagsInput);
+				let description = xss(req.body.descriptionInput);
+				let capacity = xss(req.body.capacityInput);
 				let image = false;
 
 				try {
@@ -386,21 +384,12 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 		return res.redirect('/event/' + eventId);
 	} catch (e) {
 		//
-		event.userName = userName;
-		event.userPresent = userPresent;
-		event.capacityLeft = capacityLeft;
-		event.registerLink = `/event/register/${eventId}`;
-		event.eventFavLink = `/event/fav/${eventId}`;
-		event.error_message = e;
-		event.error = true;
 
-		event.eventList = [];
-		eventList.push(event);
-
-		res.render('eventPage', {
-			title: event.eventName,
-			eventList: eventList,
-			pageName: 'eventPage',
+		return res.render('error', {
+			title: 'Registration Failed',
+			head: 'Registration Failed',
+			userPresent: true,
+			message: e,
 		});
 	}
 });
@@ -655,12 +644,12 @@ router
 				}
 
 				minCapacity = Math.max(event.numUserRegistered, 1);
-				let eventName = req.body.eventNameInput;
-				let location = req.body.locationInput;
-				let tags = req.body.tagsInput;
-				let description = req.body.descriptionInput;
-				let capacity = req.body.capacityInput;
-				let image = req.body.image;
+				let eventName = xss(req.body.eventNameInput);
+				let location = xss(req.body.locationInput);
+				let tags = xss(req.body.tagsInput);
+				let description = xss(req.body.descriptionInput);
+				let capacity = xss(req.body.capacityInput);
+				let image = xss(req.body.image);
 				let updateParamter = {};
 
 				if (req.file) {
@@ -729,7 +718,7 @@ router.route('/event/postComment/:eventId').post(async (req, res) => {
 	//
 	try {
 		let eventId = req.params.eventId.trim();
-		let commentBody = req.body.comment;
+		let commentBody = xss(req.body.comment);
 		helpers.errorIfNotProperString(commentBody);
 		let event = await eventData.getEventData(eventId);
 		let userName;

@@ -29,7 +29,7 @@ const createEvent = async (
 	}
 
 	helpers.errorIfNotProperUserName(postedBy, 'postedBy');
-	postedBy = postedBy.trim();
+	postedBy = postedBy.toLowerCase().trim();
 	let user = await users.getUserData(postedBy);
 	if (!user) throw `No user present with userName: ${postedBy}`;
 
@@ -130,6 +130,10 @@ const registerForEvent = async (eventID, userName) => {
 
 	//check if user can register for the event
 	let userEventsRegistered = user.eventsRegistered;
+	userEventsRegistered = userEventsRegistered.map(function (val) {
+		val = ObjectId(val);
+		return val;
+	});
 
 	let conflictEventList = [];
 	const event_collection_c = await event_collection();

@@ -6,7 +6,7 @@ const data = require('../data');
 const usersData = data.users;
 const { collegeList } = data;
 const { localDateTime } = data;
-
+const xss = require('xss');
 router
 	.route('/login')
 	.get(async (req, res) => {
@@ -23,8 +23,8 @@ router
 		if (req.session.user) {
 			return res.redirect('/');
 		} else {
-			let userName = req.body.usernameInput;
-			let password = req.body.passwordInput;
+			let userName = xss(req.body.usernameInput);
+			let password = xss(req.body.passwordInput);
 			try {
 				helpers.errorIfNotProperUserName(userName, 'usernames');
 				helpers.errorIfNotProperPassword(password, 'password');
@@ -72,12 +72,12 @@ router
 		if (req.session.user) {
 			return res.redirect('/');
 		} else {
-			let userName = req.body.usernameInput;
-			let password = req.body.passwordInput;
+			let userName = xss(req.body.usernameInput);
+			let password = xss(req.body.passwordInput);
 
-			let firstName = req.body.firstNameInput;
-			let lastName = req.body.lastNameInput;
-			let college = req.body.collegeNameInput;
+			let firstName = xss(req.body.firstNameInput);
+			let lastName = xss(req.body.lastNameInput);
+			let college = xss(req.body.collegeNameInput);
 
 			try {
 				helpers.errorIfNotProperUserName(userName, 'usernames');
@@ -90,21 +90,8 @@ router
 					lastName,
 					college
 				);
-				if (result.userInserted) {
-					return res.redirect('/user/login');
-				} else {
-					res.status(500).render('userRegister', {
-						title: 'Register',
-						pageName: 'userRegister',
-						collegeList: collegeList,
-						error: true,
-						error_message: `Internal Server Error`,
-						userName: userName,
-						firstName: firstName,
-						lastName: lastName,
-						college: college,
-					});
-				}
+
+				return res.redirect('/user/login');
 			} catch (e) {
 				res.status(400).render('userRegister', {
 					title: 'Register',

@@ -16,8 +16,10 @@ You will also have a link on this page that links to '/' and has the text "Alrea
     {{head}}
 </h1>
 {{message}}
+{{#if userPresent}}
+{{else}}
 <a href="/user/login">Click here to log-in</a>    
-
+{{/if}}
 <style>
     h1 {
   color: red;

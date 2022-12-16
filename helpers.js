@@ -175,6 +175,7 @@ function errorIfNotProperDateTime(val, variableName) {
 	val = val.trim();
 
 	let temp = Date.parse(val);
+
 	if (!temp) throw `Not Proper DateTime `;
 
 	let currentDateTimeString = Date.parse(new Date().toLocaleString('est'));
