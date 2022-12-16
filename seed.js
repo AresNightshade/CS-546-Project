@@ -169,7 +169,8 @@ async function main() {
 	updateParamter.favoriteEvents.push(e3._id.toString());
 	await userData.updateUser(u4.username, updateParamter);
 	console.log('done');
+	await connection.closeConnection();
 	return;
 }
 
-main();
+main().catch(console.log);

@@ -124,6 +124,16 @@ router
 		}
 	});
 
+const handleError = (err, req, res, next) => {
+	// console.log('here');
+	return res.status(400).render('error', {
+		title: 'Error',
+		head: 'Error',
+		userPresent: true,
+		message: 'Please upload a valid image file',
+	});
+};
+
 router
 	.route('/event/createEvent')
 	.get(async (req, res) => {
@@ -145,14 +155,14 @@ router
 				maxDateEndTimeString: maxDateEndTimeString,
 			});
 		} else {
-			res.render('error', {
+			res.status(404).render('error', {
 				title: 'Create Event',
 				head: 'Not Authorized',
 				message: 'Only logged in user can create the events',
 			});
 		}
 	})
-	.post(upload.single('image'), async (req, res) => {
+	.post(upload.single('image'), handleError, async (req, res) => {
 		//
 		try {
 			if (req.session.user) {
@@ -247,14 +257,14 @@ router
 				}
 				return res.redirect('/');
 			} else {
-				res.render('error', {
+				res.status(404).render('error', {
 					title: 'Not Authorized',
 					head: 'Not Authorized',
 					message: 'Only logged in user can create the events',
 				});
 			}
 		} catch (e) {
-			res.render('createEvent', {
+			res.status(500).render('createEvent', {
 				title: 'Create Event',
 				pageName: 'createEvent',
 				error: true,
@@ -322,7 +332,12 @@ router.route('/event/:eventId').get(async (req, res) => {
 		});
 	} catch (e) {
 		//
-		res.json(e);
+		return res.status(400).render('error', {
+			title: 'Error',
+			head: 'Error',
+			userPresent: true,
+			message: e,
+		});
 	}
 });
 
@@ -344,7 +359,7 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
 				message: 'Only logged in user can register in the events',
@@ -352,9 +367,10 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 		}
 
 		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't register for your own event`,
 			});
 		}
@@ -362,9 +378,10 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 		if (
 			event.college.toLowerCase().trim() !== user.college.toLowerCase().trim()
 		) {
-			return res.render('error', {
+			return res.status(400).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't register for different college event`,
 			});
 		}
@@ -375,6 +392,7 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 			return res.render('error', {
 				title: 'Event Full',
 				head: 'Event at Capacity',
+				userPresent: userPresent,
 				message: 'Sorry! but the event is at full capacity',
 			});
 		}
@@ -384,7 +402,7 @@ router.route('/event/register/:eventId').get(async (req, res) => {
 	} catch (e) {
 		//
 
-		return res.render('error', {
+		return res.status(400).render('error', {
 			title: 'Registration Failed',
 			head: 'Registration Failed',
 			userPresent: true,
@@ -410,17 +428,19 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: 'Only logged in user can favorite a the events',
 			});
 		}
 
 		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
-			return res.render('error', {
+			return res.status(400).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't set your own event as favorite`,
 			});
 		}
@@ -428,9 +448,10 @@ router.route('/event/fav/:eventId').get(async (req, res) => {
 		if (
 			event.college.toLowerCase().trim() !== user.college.toLowerCase().trim()
 		) {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't fav  different college event`,
 			});
 		}
@@ -474,17 +495,19 @@ router.route('/event/deregister/:eventId').get(async (req, res) => {
 			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: 'Only logged in user can deregister in the events',
 			});
 		}
 
 		if (event.postedBy.toLowerCase().trim() === userName.toLowerCase().trim()) {
-			return res.render('error', {
+			return res.status(400).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't de-register for your own event`,
 			});
 		}
@@ -535,7 +558,7 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 			userFav = user.favoriteEvents.includes(eventId) ? true : false;
 			userName = user.username;
 		} else {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
 				message: 'Only logged in user can delete a event',
@@ -543,9 +566,10 @@ router.route('/event/delete/:eventId').get(async (req, res) => {
 		}
 
 		if (event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()) {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
+				userPresent: userPresent,
 				message: `You can't delete someone else's event`,
 			});
 		}
@@ -582,6 +606,7 @@ router
 		let user;
 		let event = {};
 		let minCapacity;
+		let userPresent;
 		let userName;
 		try {
 			event = await eventData.getEventData(eventId);
@@ -589,10 +614,12 @@ router
 			if (req.session.user) {
 				user = await userData.getUserData(req.session.user);
 				userName = user.username;
+				userPresent = true;
 			} else {
-				return res.render('error', {
+				return res.status(404).render('error', {
 					title: 'Not Authorized',
 					head: 'Not Authorized',
+					userPresent: userPresent,
 					message: 'Only logged in user can edit a event',
 				});
 			}
@@ -600,9 +627,10 @@ router
 			if (
 				event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()
 			) {
-				return res.render('error', {
+				return res.status(404).render('error', {
 					title: 'Not Authorized',
 					head: 'Not Authorized',
+					userPresent: userPresent,
 					message: `You can't edit someone else's event`,
 				});
 			}
@@ -614,14 +642,15 @@ router
 			});
 		} catch (e) {
 			//
-			return res.render('error', {
+			return res.status(400).render('error', {
 				title: 'Error',
 				head: `Error`,
+				userPresent: userPresent,
 				message: e,
 			});
 		}
 	})
-	.post(upload.single('image'), async (req, res) => {
+	.post(upload.single('image'), handleError, async (req, res) => {
 		//
 		let eventId = req.params.eventId.trim();
 		let minCapacity;
@@ -635,7 +664,7 @@ router
 				if (
 					event.postedBy.toLowerCase().trim() !== userName.toLowerCase().trim()
 				) {
-					return res.render('error', {
+					return res.status(404).render('error', {
 						title: 'Not Authorized',
 						head: 'Not Authorized',
 						message: `You can't edit someone else's event`,
@@ -694,7 +723,7 @@ router
 				event = await eventData.updateEvent(eventId, updateParamter);
 				return res.redirect('/event/' + eventId);
 			} else {
-				res.render('error', {
+				res.status(404).render('error', {
 					title: 'Not Authorized',
 					head: 'Not Authorized',
 					message: 'Only logged in user can edit the events',
@@ -724,7 +753,7 @@ router.route('/event/postComment/:eventId').post(async (req, res) => {
 			user = await userData.getUserData(req.session.user);
 			userName = user.username;
 		} else {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: 'Not Authorized',
 				head: 'Not Authorized',
 				message: 'Only logged in user can comment on a event',
