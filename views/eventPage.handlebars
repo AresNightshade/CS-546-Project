@@ -13,10 +13,10 @@
 
 
   <article>
-    <h2>{{eventName}}</h2>
+    <h1>{{eventName}}</h1>
     <p>
       {{#if imagePath}}
-      <img src="{{imagePath}}">
+      <img src="{{imagePath}}" alt="Event Image">
       <br>
       {{/if}}
       Start Time: {{formatDate startTime "YYYY-MM-DD hh:mm"}}<br>
@@ -59,7 +59,7 @@
     <br>
     <a href={{editEvent}}>Edit the Event</a>
     <br>
-    <h3>Registered User List</h3>
+    <h2>Registered User List</h2>
     {{#if usersRegistered}}
       <ol>
       {{#each usersRegistered}}
@@ -73,11 +73,12 @@
 
 
   {{#if userPresent}}
-    <h5>Leave a Comment</h5>
+    <h3>Leave a Comment</h3>
       <form method="POST"  onsubmit="return doComment(this);" id="new-comment-form">
         <input type="hidden" name="postCommentLink" value={{postCommentLink}} >
         <div class="form-group">
-          <textarea class="form-control" name="comment" rows="2"></textarea>
+          <label for="commmentBody">Enter the Comment Here</label>
+          <textarea id="commmentBody" class="form-control" name="comment" rows="2"></textarea>
         </div>
         <button type="submit" class="btn-primary">Post Comment</button>
       </form>
@@ -87,7 +88,7 @@
     <ul id="commentList">    
     {{#each comments}}
     <li><article>
-      <h3>{{userName}} commented on {{ formatDate commentDate "YYYY-MM-DD"}}</h3>
+      <p>{{userName}} commented on {{ formatDate commentDate "YYYY-MM-DD"}}</p>
       <br>
         {{body}}
       </article></li>
