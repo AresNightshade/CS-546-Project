@@ -1,4 +1,7 @@
 # CS-546-Group-Project
+
+# CS-546-Group-Project
+
 Getting Started
 Install the node modules by running "npm i"
 
