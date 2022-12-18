@@ -9,3 +9,5 @@ Start the server by running "npm start"
 Notes
 The seed file does not include photos for events. These can be uploaded by the user when creating or editing an event.
 The application is currently only valid for 3 colleges. If additional colleges need to be added, update the array in the cont_data file.
+
+Git Project Link: https://github.com/AresNightshade/CS-546-Project
